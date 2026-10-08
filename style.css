@@ -234,3 +234,56 @@ body{background:radial-gradient(ellipse at 50% 0%,#321811 0%,#0a0b0c 50%,#070809
 .song{min-height:51px!important;padding:6px 10px!important}.other-platforms{margin-top:12px!important}
 .player-disclaimer{font-size:10px!important;margin-top:6px!important}
 }
+
+
+/* V9: Reference-driven industrial metal UI. Functional selectors remain unchanged. */
+:root{--bg:#08090a;--panel:#111315;--panel2:#17191b;--line:#4c4140;--text:#f0e9e2;--muted:#b2a6a0;--orange:#df5537;--gold:#e7a56d;--red:#a32824}
+body{background:#090b0d;color:var(--text)}
+.hero{height:clamp(180px,16vw,270px)!important;background-size:cover!important;background-position:center!important;border-bottom:2px solid #a63b2d;box-shadow:0 8px 32px #000c}
+.hero-inner,.hero-shade{display:none!important}
+.topnav{background:linear-gradient(#17191a,#0a0c0e)!important;border-top:1px solid #51433d;border-bottom:2px solid #49332e;box-shadow:inset 0 1px #ffffff14,0 6px 20px #000a;min-height:70px}
+.topnav button{font-weight:800;color:#e1d7ce}.topnav button.active{background:linear-gradient(0deg,#501d1b90,transparent);border-bottom:3px solid #f05a42;color:#fff}
+.layout{max-width:1700px;grid-template-columns:265px minmax(0,1fr);background:#090b0d}
+.sidebar{background:repeating-linear-gradient(135deg,#ffffff04 0 1px,transparent 1px 17px),linear-gradient(100deg,#161719,#090b0d);border-right:2px solid #47322f;box-shadow:inset -10px 0 25px #0009}
+.side-art{height:230px;background:radial-gradient(ellipse at 50% 35%,#3d2524,#090b0d 68%);border-bottom:1px solid #4e3432}
+.side-art img{mix-blend-mode:normal;object-fit:contain;filter:contrast(1.1) brightness(.9);height:180px;width:180px;top:0}
+.side-art-title{font-family:Georgia,serif;letter-spacing:2px;color:#eee1d3;text-shadow:2px 3px 0 #000}
+.side-menu button{border-radius:2px;border:1px solid transparent}.side-menu button.active{border-color:#9d3d32;background:linear-gradient(90deg,#4c1919,#241415);box-shadow:inset 0 0 0 1px #f19b5b24}
+.main{background:repeating-linear-gradient(130deg,#ffffff02 0 1px,transparent 1px 18px),radial-gradient(ellipse at top right,#361a1926,transparent 52%),#0b0d0f;padding-top:30px}
+.heading-row{align-items:end}.heading-row h2{font-family:Georgia,serif!important;font-size:clamp(30px,3vw,47px)!important;letter-spacing:0;color:#e9ded3;text-shadow:2px 3px 0 #000}.heading-row h2 em{color:#e8b49b}
+.overline{color:#c06b55}.toolbar{align-items:stretch}.search,.toolbar select,.view-switch{background:#0b0e10;border:1px solid #5a4b45;border-radius:4px}.view-switch button.active{background:linear-gradient(#5c211b,#291515);box-shadow:inset 0 -2px #f35c43}
+.band-grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:14px}
+.band-card{background:linear-gradient(#1b1d20,#0c0e10)!important;border:1px solid #5a5350!important;border-radius:7px!important;box-shadow:inset 0 0 0 1px #ffffff0a,0 6px 18px #000d!important;transition:transform .2s,border-color .2s}
+.band-card:hover{border-color:#d86b4b!important;transform:translateY(-3px)}
+.band-art{display:flex;width:100%;height:170px;padding:0;border:0;border-bottom:1px solid #554640;background:#131518;cursor:pointer;align-items:flex-end;justify-content:center;position:relative;text-align:center}
+.band-photo{filter:saturate(.8) contrast(1.16)}.band-photo-shade{background:linear-gradient(0deg,#07090bf2,transparent 70%)}
+.band-name{font-family:'Barlow Condensed',Impact,sans-serif!important;font-size:clamp(22px,2.2vw,36px)!important;line-height:.95;letter-spacing:.5px;padding:12px 7px 15px;z-index:2}
+.card-play{position:absolute;z-index:4;right:6px;top:6px;padding:5px 7px;background:#110c0cce;border:1px solid #a84d39;border-radius:2px;color:#ffd1a9;font:800 10px 'Barlow Condensed',sans-serif;letter-spacing:1px;opacity:0;transition:opacity .2s}
+.band-art:hover .card-play,.band-art:focus-visible .card-play{opacity:1}
+.band-body{padding:8px 10px 10px!important}.band-title-open{display:block;width:100%;border:0;background:transparent;color:#eee2d7;font:800 16px 'Barlow Condensed',sans-serif;text-align:left;cursor:pointer;padding:0 0 9px}.band-title-open:hover{color:#f5a276}
+.rating-buttons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding-top:8px;border-top:1px solid #463c38}.rating-buttons button{border:1px solid #514844;background:linear-gradient(#222427,#111315);color:#dfd7d0;font-size:20px;border-radius:50%;width:35px;height:35px;padding:0;justify-self:center;flex:initial}.rating-buttons button.active{background:#51221c;color:#ffb55c;border-color:#eb7c43;box-shadow:0 0 11px #d74a2e44}
+.band-meta,.listen{display:none!important}
+.modal-panel{border:2px solid #85503c;border-radius:5px;background:linear-gradient(#221a18,#0b0d0f);box-shadow:0 25px 100px #000}
+.modal-header{background:linear-gradient(105deg,#2e1715,#0e1114 80%);border-bottom:1px solid #794432}.modal-header h2{font-family:'Barlow Condensed',Impact,sans-serif!important}
+.modal-close{position:sticky;float:right;top:9px;right:9px;margin:9px;z-index:9;border-radius:3px}
+.modal-columns{background:#0b0e10}.studio-preview{min-height:330px}.video-area{min-height:0}
+.list-view .band-body{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center}.list-view .band-title-open{width:auto}.list-view .rating-buttons{min-width:150px}.list-view .band-art{height:125px}
+@media(max-width:1100px){.band-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:730px){
+.hero{height:auto!important;aspect-ratio:3.25/1;background-size:100% 100%!important;background-position:center!important}
+.topnav{position:sticky;display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;padding:0!important;overflow:visible!important;min-height:64px}
+.topnav .nav-brand{display:none!important}
+.topnav>button{display:flex;min-width:0!important;flex-direction:column;align-items:center;justify-content:center;white-space:normal!important;gap:4px;padding:9px 1px!important;font-size:11px!important;line-height:1.1;letter-spacing:0}
+.topnav>button span{margin:0;font-size:21px!important}
+.topnav .nav-tools{grid-column:1/-1;display:flex;justify-content:flex-end;margin:0;border-top:1px solid #352a27;min-height:28px}
+.topnav .nav-tools button{font-size:10px!important;padding:5px 12px!important}
+.layout{display:block}.sidebar{padding:10px 10px 12px;border-right:0;border-bottom:2px solid #5d322b}
+.side-art,.side-label,.sidebar-note{display:none!important}
+.side-menu{display:flex;flex-wrap:wrap;overflow:visible;gap:5px}.side-menu button{flex:1 1 auto;width:auto;white-space:nowrap;font-size:12px;padding:8px 9px}.side-menu button>span{width:auto;font-size:15px}
+.progress-head{padding-top:9px}.progress-track{margin:7px 8px 0}.main{padding:18px 12px}
+.heading-row{margin-bottom:15px}.heading-row h2{font-size:32px!important}.heading-row p{font-size:12px}.headline-count{display:none}
+.toolbar{display:grid;grid-template-columns:1fr auto;gap:8px}.search{grid-column:1/-1;min-width:0;max-width:none}.toolbar select,.view-switch{min-height:42px}.view-switch{margin:0}
+.band-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px}.band-art{height:clamp(125px,31vw,185px)!important}.band-name{font-size:clamp(21px,5vw,31px)!important}.band-body{padding:7px!important}.band-title-open{font-size:15px;padding-bottom:6px}.rating-buttons{padding-top:6px;gap:2px}.rating-buttons button{width:33px;height:33px;font-size:19px}
+.card-play{opacity:1;font-size:9px;padding:4px 5px}.band-grid.list-view{grid-template-columns:1fr!important}.list-view .band-card{grid-template-columns:115px 1fr}.list-view .band-art{height:100%!important;min-height:120px}.list-view .band-body{display:block}.list-view .rating-buttons{min-width:0}
+.modal{padding:0;align-items:stretch}.modal-panel{width:100%;height:100dvh;max-height:100dvh;border-radius:0;overflow-y:auto}.modal-header{padding:8px 16px 14px!important}.modal-header h2{font-size:clamp(38px,10vw,56px)!important;margin:7px 0}.modal-header p{font-size:12px;line-height:1.4;margin:6px 0}.modal-band-photo{height:95px!important;min-height:0!important}.modal-rating{margin-top:8px}.modal-columns{display:flex;flex-direction:column;padding:14px 16px 24px!important;gap:15px}.studio-preview{min-height:0;padding:14px;gap:7px}.studio-cover{width:105px;height:105px}.studio-preview h3{font-size:24px}.video-placeholder{min-height:140px}.song{min-height:54px}.panel-heading{margin-bottom:8px}
+}

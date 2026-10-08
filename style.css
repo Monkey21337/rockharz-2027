@@ -168,3 +168,10 @@
  .stream-links a{padding:8px 10px;font-size:10px}
 }
 @media(max-width:370px){.modal-header{grid-template-columns:78px minmax(0,1fr)}.modal-band-photo{height:95px}.modal-header h2{font-size:26px}.topnav>button[data-page]{font-size:9px}}
+
+/* V7: Original festival-stage composition, undead stag and full-width responsive banner. */
+.hero{height:auto;aspect-ratio:1672/941;max-height:580px;background-image:url('assets/festival-banner.webp?v=7');background-size:contain;background-position:center;background-color:#0b0909}
+.hero-shade,.hero-inner{display:none!important}
+@media(min-width:900px){.hero{aspect-ratio:1672/690;background-size:100% auto;background-position:center 49%}}
+@media(max-width:850px){.hero{height:auto;aspect-ratio:1672/941;max-height:none;background-size:100% 100%;background-position:center}.topnav{width:100%;overflow-x:hidden!important}.topnav>button[data-page]{font-size:clamp(8px,2.5vw,11px)}.modal-panel{overflow-y:auto!important}.modal-close{position:sticky;top:6px;align-self:flex-end;margin-bottom:-38px;right:auto;z-index:10}.modal-header{padding-top:40px}.modal-columns{flex:0 0 auto}}
+@media(max-width:420px){.topnav>button[data-page]{letter-spacing:0}}

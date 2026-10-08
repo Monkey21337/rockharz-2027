@@ -175,3 +175,62 @@
 @media(min-width:900px){.hero{aspect-ratio:1672/690;background-size:100% auto;background-position:center 49%}}
 @media(max-width:850px){.hero{height:auto;aspect-ratio:1672/941;max-height:none;background-size:100% 100%;background-position:center}.topnav{width:100%;overflow-x:hidden!important}.topnav>button[data-page]{font-size:clamp(8px,2.5vw,11px)}.modal-panel{overflow-y:auto!important}.modal-close{position:sticky;top:6px;align-self:flex-end;margin-bottom:-38px;right:auto;z-index:10}.modal-header{padding-top:40px}.modal-columns{flex:0 0 auto}}
 @media(max-width:420px){.topnav>button[data-page]{letter-spacing:0}}
+
+
+/* V8: clearer metal design and practical mobile controls */
+:root{--bg:#08090a;--panel:#121212;--panel2:#211714;--line:#675041;--orange:#e96a31;--gold:#e8b67a;--red:#a72821}
+body{background:radial-gradient(ellipse at 50% 0%,#321811 0%,#0a0b0c 50%,#070809 100%);color:#eee4d8}
+.hero{height:clamp(210px,29vw,440px);background-position:center;background-size:contain;background-color:#090808;border-bottom:5px solid #6e3021}
+.hero-shade,.hero-inner{display:none!important}
+.hero:after{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 55px #0009}
+.topnav{background:#0b0b0d;border-bottom:2px solid #793c29;box-shadow:0 5px 25px #000a}
+.topnav button.active{background:linear-gradient(#3e1c16,#1a1110);color:#ffc08b}
+.sidebar{background:linear-gradient(170deg,#221714,#0c0c0d 70%);border-right:2px solid #513126}
+.main{background:radial-gradient(circle at top,#30171255,transparent 42%),repeating-linear-gradient(135deg,transparent 0 13px,#ffffff03 14px 15px),#0c0d0e}
+.band-card{border:1px solid #6b4b37;border-radius:2px;background:linear-gradient(145deg,#27201c,#0d0f10 75%);box-shadow:inset 0 0 0 1px #120e0c,0 9px 22px #000a}
+.band-card:hover{border-color:#e58a4e}
+.band-art{border-bottom:2px solid #a34b29}
+.listen{background:linear-gradient(110deg,#492117,#271512);border-color:#96583a;color:#fbd1a3}
+.rating-buttons button{border-color:#694b3c}
+.heading-row h2{color:#f5e9dc;text-shadow:2px 3px 0 #5a261c}
+.modal-panel{border:2px solid #aa643b;background:linear-gradient(145deg,#281915,#0d0e0f 70%);box-shadow:0 0 0 5px #090909,0 20px 75px #000}
+@media(max-width:730px){
+.hero{height:auto;aspect-ratio:2.35/1;background-size:100% auto;background-position:center}
+.topnav{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));padding:0!important;gap:0!important;overflow:visible!important;min-height:64px}
+.topnav .nav-brand{display:none!important}
+.topnav>button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:0!important;white-space:normal!important;padding:9px 2px!important;font-size:12px!important;line-height:1.1}
+.topnav>button span{display:block;margin:0!important;font-size:20px!important}
+.topnav .nav-tools{grid-column:1/-1;display:flex;justify-content:flex-end;min-height:31px;margin:0;border-top:1px solid #39241d}
+.topnav .nav-tools button{font-size:11px!important;padding:5px 12px!important}
+.layout{display:block!important}
+.sidebar{padding:10px 10px 13px!important;border-right:0;border-bottom:2px solid #603624}
+.side-art,.sidebar-note,.side-label{display:none!important}
+.side-menu{display:flex!important;flex-wrap:wrap;gap:5px!important}
+.side-menu button{width:auto!important;flex:1 1 auto;padding:8px 9px!important;font-size:12px!important;min-height:37px}
+.side-menu button>span{font-size:14px!important;width:auto!important}
+.progress-head{margin-top:10px}.progress-track{margin:7px 8px 0}
+.main{padding:20px 12px!important}
+.heading-row{margin-bottom:14px}.heading-row h2{font-size:42px}
+.toolbar{display:grid!important;grid-template-columns:1fr auto;gap:8px!important}
+.search{grid-column:1/-1;max-width:none;min-height:45px}
+.toolbar select{min-height:41px}.view-switch{margin-left:0;min-height:41px}
+.band-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+.band-card{min-width:0}.band-art{height:125px!important}
+.band-body{padding:10px!important}.band-body h3{font-size:20px}
+.listen{margin:10px 0!important;padding:10px 2px!important;font-size:12px!important}
+.rating-buttons{gap:4px}.rating-buttons button{min-height:35px}
+.band-grid.list-view{grid-template-columns:1fr!important}
+.modal{padding:0!important;align-items:stretch!important}
+.modal-panel{width:100%!important;height:100dvh!important;max-height:100dvh!important;overflow-y:auto!important;border-left:0;border-right:0}
+.modal-header{padding:10px 15px 12px!important}
+.modal-header h2{font-size:clamp(37px,9vw,56px)!important;margin:5px 0!important}
+.modal-header p{font-size:12px!important;line-height:1.4!important;margin:6px 0!important}
+.modal-band-photo{height:95px!important;min-height:0!important}
+.modal-rating{margin-top:7px!important}
+.modal-columns{display:flex!important;flex-direction:column!important;gap:12px!important;padding:10px 15px 22px!important}
+.video-area{min-height:0!important}.video-placeholder{min-height:145px!important;padding:12px!important;gap:6px!important}
+.video-placeholder h3{font-size:21px!important}.video-placeholder p{font-size:12px!important}
+.studio-preview{min-height:0!important}.song-list{gap:6px!important}
+.song{min-height:51px!important;padding:6px 10px!important}.other-platforms{margin-top:12px!important}
+.player-disclaimer{font-size:10px!important;margin-top:6px!important}
+}

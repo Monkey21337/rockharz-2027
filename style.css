@@ -290,3 +290,8 @@ body{background:#090b0d;color:var(--text)}
 
 /* V9.1 – Entire band card opens its listening panel */
 .band-card{cursor:pointer}.band-card:focus-visible{outline:2px solid #ffad65;outline-offset:3px}.band-card .rating-buttons button{cursor:pointer}
+
+/* V9.2: Banner fills the full desktop viewport; mobile shows the complete artwork. */
+.hero{width:100%;max-width:none!important;height:auto!important;aspect-ratio:1536/235!important;min-height:0!important;max-height:none!important;background-image:url('assets/festival-banner.webp?v=9-2')!important;background-size:100% 100%!important;background-position:center!important;background-repeat:no-repeat!important}
+@media(max-width:730px){.hero{aspect-ratio:2.5/1!important;background-size:cover!important;background-position:center!important}}
+@media(max-width:420px){.hero{aspect-ratio:2.2/1!important}}

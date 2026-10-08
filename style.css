@@ -304,3 +304,21 @@ body{background:#090b0d;color:var(--text)}
 /* V9.4: two undistorted banner compositions; never use cover or stretched 100% 100%. */
 .hero{width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;aspect-ratio:2128/739!important;background-image:url('assets/festival-banner.webp?v=9-4')!important;background-size:contain!important;background-position:center center!important;background-repeat:no-repeat!important;background-color:#0b0909!important}
 @media(max-width:730px){.hero{aspect-ratio:1564/739!important;background-image:url('assets/festival-banner-mobile.webp?v=9-4')!important;background-size:contain!important;background-position:center!important}}
+
+/* V9.5 – Bandfenster im gleichen Stahl-/Rost-Design wie die Hauptseite */
+.modal{background:rgba(0,0,0,.82)!important;backdrop-filter:blur(5px)}
+.modal-panel{background:#101113!important;border:1px solid #64412e!important;border-radius:3px!important;box-shadow:0 24px 85px #000e,0 0 0 2px #090a0b!important;color:#eee5d9!important}
+.modal-header{background:linear-gradient(120deg,#211b19 0%,#111315 75%)!important;border-bottom:2px solid #7c3d2a!important}
+.modal-header h2{color:#f2e9dc!important;text-shadow:2px 2px #54281d!important}
+.modal-header .overline,.panel-heading strong{color:#db9368!important}
+.modal-header p{color:#c9bdb2!important;display:block!important;overflow:visible!important;-webkit-line-clamp:unset!important;max-width:72ch!important}
+.modal-columns,.modal-body,.player-column,.songs-column{background:#101113!important;color:#e8dfd4!important}
+.panel-heading{border-bottom:1px solid #50372b!important;color:#dfaa7e!important}
+.studio-preview,.video-placeholder{background:linear-gradient(140deg,#1d1b1a,#101214)!important;border:1px solid #4b362d!important;color:#eae2d8!important}
+.song{background:#191b1d!important;color:#eee3d6!important;border:1px solid #45372f!important;border-radius:3px!important}
+.song:hover,.song.active{background:#31201b!important;border-color:#bc6d42!important}
+.song small,.studio-preview small,.player-disclaimer{color:#b5a69a!important}
+.preview-links,.stream-links{display:flex!important;flex-wrap:wrap!important;gap:8px!important}
+.preview-links a,.stream-links a,.video-placeholder a{color:#efb083!important;border-color:#765039!important}
+.modal-close{background:#211817!important;color:#f5e5d5!important;border:1px solid #8b4934!important}
+@media(max-width:730px){.modal-header p{font-size:12px!important;line-height:1.4!important}.modal-header{gap:12px!important}.modal-panel{border-left:0!important;border-right:0!important}}

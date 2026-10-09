@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#090b0d">
+  <title>ROCKHARZ 2027 · Rock statt Reha</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=70">
+  <link rel="stylesheet" href="rockharz-theme.css?v=70">
+</head>
+<body>
+
+  <!-- HERO BANNER -->
+  <header class="hero" id="top"></header>
+
+  <!-- HAUPTNAVIGATION -->
+  <nav class="topnav" aria-label="Hauptnavigation">
+    <button class="nav-brand" id="brand-reset" title="Zurück zur Komplettansicht">
+      <span class="brand-icon-stag" aria-hidden="true"></span>
+      <span>RH<span class="orange">27</span></span>
+    </button>
+
+    <button data-page="lineup" class="active"><span>☠</span> LINE-UP</button>
+    <button data-page="favorites"><span>★</span> MEINE BANDS <b id="nav-count-favorites" class="nav-badge">0</b></button>
+    <button data-page="unrated"><span>◇</span> NOCH OFFEN <b id="nav-count-unrated" class="nav-badge">0</b></button>
+    <button data-page="schedule"><span>▦</span> RUNNING ORDER</button>
+
+    <div class="nav-tools">
+      <button id="export" title="Auswahl exportieren">⇩ EXPORT</button>
+      <button id="import" title="Auswahl importieren">⇧ IMPORT</button>
+      <input id="import-file" type="file" accept="application/json" hidden>
+    </div>
+  </nav>
+
+  <!-- FESTIVALTAGE -->
+  <section class="festival-days" aria-label="Festivaltage filtern">
+    <div class="festival-days-inner">
+      <button class="festival-day festival-day-wednesday" data-day-filter="2027-07-07" title="Nach Mittwoch filtern">
+        <span class="day-symbol"></span>
+        <div class="day-text">
+          <strong>MITTWOCH</strong>
+          <small>07. JULI · METAL MITTWOCH</small>
+        </div>
+      </button>
+      <button class="festival-day festival-day-thursday" data-day-filter="2027-07-08" title="Nach Donnerstag filtern">
+        <span class="day-symbol"></span>
+        <div class="day-text">
+          <strong>DONNERSTAG</strong>
+          <small>08. JULI</small>
+        </div>
+      </button>
+      <button class="festival-day festival-day-friday" data-day-filter="2027-07-09" title="Nach Freitag filtern">
+        <span class="day-symbol"></span>
+        <div class="day-text">
+          <strong>FREITAG</strong>
+          <small>09. JULI</small>
+        </div>
+      </button>
+      <button class="festival-day festival-day-saturday" data-day-filter="2027-07-10" title="Nach Samstag filtern">
+        <span class="day-symbol"></span>
+        <div class="day-text">
+          <strong>SAMSTAG</strong>
+          <small>10. JULI</small>
+        </div>
+      </button>
+    </div>
+  </section>
+
+  <!-- 2-SPALTEN LAYOUT (GRID | DETAIL DRAWER) -->
+  <div class="layout layout-two-col">
+
+    <!-- HAUPTINHALT -->
+    <main class="main">
+
+      <!-- SEITE: LINE-UP -->
+      <section id="page-lineup" class="page">
+        <div class="heading-row">
+          <div>
+            <h2 id="main-heading">DAS <em>LINE-UP</em></h2>
+            <p id="lineup-subtitle">BANDS · DEINE PERSÖNLICHE FESTIVALPLANUNG</p>
+          </div>
+
+          <div class="toolbar-inline">
+            <button id="reset-view-btn" class="day-reset-btn hidden" title="Alle Filter aufheben und zur Komplettansicht">✕ Filter zurücksetzen</button>
+            <label class="search">
+              <span>⌕</span>
+              <input id="search" type="search" placeholder="Band suchen..." autocomplete="off">
+            </label>
+          </div>
+        </div>
+
+        <div id="band-grid" class="band-grid-concept"></div>
+      </section>
+
+      <!-- SEITE: MEINE BANDS -->
+      <section id="page-favorites" class="page hidden">
+        <div class="heading-row">
+          <div>
+            <h2>MEINE <em>BANDS</em></h2>
+            <p>Deine persönliche Auswahl (Ja & Vielleicht).</p>
+          </div>
+        </div>
+        <div id="mine-grid" class="band-grid-concept"></div>
+      </section>
+
+      <!-- SEITE: NOCH OFFEN -->
+      <section id="page-unrated" class="page hidden">
+        <div class="heading-row">
+          <div>
+            <h2>NOCH <em>OFFEN</em></h2>
+            <p>Bands, die du bisher noch nicht bewertet hast.</p>
+          </div>
+        </div>
+        <div id="unrated-grid" class="band-grid-concept"></div>
+      </section>
+
+      <!-- SEITE: RUNNING ORDER -->
+      <section id="page-schedule" class="page hidden">
+        <div class="heading-row">
+          <div>
+            <h2>RUNNING <em>ORDER</em></h2>
+            <p>Offizielle Spielzeiten folgen, sobald der Veranstalter sie bestätigt.</p>
+          </div>
+        </div>
+        <div id="schedule" class="schedule"></div>
+      </section>
+    </main>
+
+    <!-- RECHTES DETAIL-PANEL -->
+    <aside class="band-detail-drawer" id="detail-drawer">
+      <button class="drawer-close" id="drawer-close-btn" aria-label="Schließen">✕</button>
+      
+      <div class="drawer-header-art">
+        <img id="detail-img" src="assets/all-for-metal-art.webp" alt="Band Foto">
+        <h2 id="detail-title">ALL FOR METAL</h2>
+      </div>
+
+      <div class="drawer-content">
+        <div class="drawer-meta-line">
+          <span class="drawer-genre" id="detail-genre">Heavy Metal</span>
+          <a href="#" target="_blank" rel="noopener" class="drawer-website-btn" id="detail-website">
+            Zur Band-Website ↗
+          </a>
+        </div>
+
+        <div class="drawer-desc-block">
+          <p id="detail-desc" class="desc-collapsed"></p>
+          <button id="desc-expand-btn" class="desc-expand-link">Mehr anzeigen ∨</button>
+        </div>
+
+        <div class="drawer-section-title">DEINE WERTUNG</div>
+        <div class="drawer-ratings-block" id="detail-rating-btns"></div>
+
+        <div class="drawer-section-title sound-check-title">
+          <span>♫ SOUND CHECK</span>
+          <small>TOP 3</small>
+        </div>
+        <div class="drawer-songs-list" id="detail-songs"></div>
+      </div>
+    </aside>
+
+  </div>
+
+  <script src="bands.js?v=70"></script>
+  <script src="app.js?v=70"></script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 120 150">
+  <g fill="none"
+     stroke="#fff"
+     stroke-linecap="round"
+     stroke-linejoin="round">
+
+    <!-- Linkes Geweih -->
+    <path d="M50 64
+             C37 47 24 37 17 16
+             M37 49
+             C24 47 13 37 8 26
+             M31 41
+             C27 28 28 18 25 7
+             M43 55
+             C37 33 39 19 42 5
+             M45 58
+             C32 60 19 57 8 49"
+          stroke-width="5"/>
+
+    <!-- Rechtes Geweih -->
+    <path d="M70 64
+             C83 47 96 37 103 16
+             M83 49
+             C96 47 107 37 112 26
+             M89 41
+             C93 28 92 18 95 7
+             M77 55
+             C83 33 81 19 78 5
+             M75 58
+             C88 60 101 57 112 49"
+          stroke-width="5"/>
+
+    <!-- Schädel -->
+    <path d="M43 61
+             L60 55
+             L77 61
+             L88 80
+             L84 107
+             L71 125
+             L65 143
+             L60 148
+             L55 143
+             L49 125
+             L36 107
+             L32 80
+             Z"
+          fill="#fff"
+          stroke-width="3"/>
+
+    <!-- Stirnstruktur -->
+    <path d="M60 60
+             L60 89
+             M46 70
+             L52 81
+             M74 70
+             L68 81"
+          stroke="#171717"
+          stroke-width="3"/>
+
+    <!-- Augen -->
+    <path d="M39 87
+             L53 91
+             L49 101
+             L42 99
+             Z"
+          fill="#111"
+          stroke="none"/>
+
+    <path d="M81 87
+             L67 91
+             L71 101
+             L78 99
+             Z"
+          fill="#111"
+          stroke="none"/>
+
+    <!-- Nase -->
+    <path d="M55 114
+             L60 106
+             L65 114
+             L60 121
+             Z"
+          fill="#111"
+          stroke="none"/>
+
+    <!-- Schädelspitze -->
+    <path d="M53 125
+             L60 137
+             L67 125"
+          stroke="#111"
+          stroke-width="3"/>
+  </g>
+</svg>

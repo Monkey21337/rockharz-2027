@@ -3,37 +3,39 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#090b0d">
+  <meta name="theme-color" content="#030e09">
   <title>ROCKHARZ 2027 · Rock statt Reha</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=80">
-  <link rel="stylesheet" href="rockharz-theme.css?v=80">
+  <link rel="stylesheet" href="style.css?v=90">
+  <link rel="stylesheet" href="rockharz-theme.css?v=90">
 </head>
 <body>
 
-  <!-- HERO BANNER (Responsive via CSS) -->
+  <!-- HERO BANNER -->
   <header class="hero" id="top"></header>
 
   <!-- HAUPTNAVIGATION -->
   <nav class="topnav" aria-label="Hauptnavigation">
-    <button class="nav-brand" id="brand-reset" title="Zurück zur Komplettansicht">
-      <span class="brand-icon-stag" aria-hidden="true"></span>
-      <span>RH<span class="orange">27</span></span>
-    </button>
+    <div class="topnav-top-row">
+      <button class="nav-brand" id="brand-reset" title="Zurück zur Komplettansicht">
+        <span class="brand-icon-stag" aria-hidden="true"></span>
+        <span>RH<span class="gold">27</span></span>
+      </button>
+
+      <div class="nav-tools">
+        <button id="export" title="Auswahl exportieren">⇩ <span>EXPORT</span></button>
+        <button id="import" title="Auswahl importieren">⇧ <span>IMPORT</span></button>
+        <input id="import-file" type="file" accept="application/json" hidden>
+      </div>
+    </div>
 
     <div class="nav-links">
       <button data-page="lineup" class="active"><span>☠</span> LINE-UP</button>
       <button data-page="favorites"><span>★</span> MEINE BANDS <b id="nav-count-favorites" class="nav-badge">0</b></button>
       <button data-page="unrated"><span>◇</span> NOCH OFFEN <b id="nav-count-unrated" class="nav-badge">0</b></button>
       <button data-page="schedule"><span>▦</span> RUNNING ORDER</button>
-    </div>
-
-    <div class="nav-tools">
-      <button id="export" title="Auswahl exportieren">⇩ <span>EXPORT</span></button>
-      <button id="import" title="Auswahl importieren">⇧ <span>IMPORT</span></button>
-      <input id="import-file" type="file" accept="application/json" hidden>
     </div>
   </nav>
 
@@ -170,7 +172,7 @@
 
   </div>
 
-  <script src="bands.js?v=80"></script>
-  <script src="app.js?v=80"></script>
+  <script src="bands.js?v=90"></script>
+  <script src="app.js?v=90"></script>
 </body>
 </html>

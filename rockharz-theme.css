@@ -1,24 +1,38 @@
 /* =========================================================
-   ROCKHARZ OFFICIAL COLOR SCHEME & MOBILE-FIRST OPTIMIZATION
+   ROCKHARZ OFFICIAL DESIGN 2027
+   - Farbschema der Website: Dark Forest Night (#030e09 / #061611)
+   - Akzente: Bernstein-Gold (#e5ba55 / #f3cb65) & Moosgrün
+   - Mobile: 100% passgenaue Navigation ohne horizontales Scrollen
    ========================================================= */
 
 :root {
-  --rh-bg: #090b0d;
-  --rh-panel: #121518;
-  --rh-panel-dark: #0d1012;
-  --rh-border: #38271e;
-  --rh-border-light: #52372a;
+  /* Rockharz Website Originalfarben */
+  --rh-bg: #030e09;
+  --rh-bg-gradient: radial-gradient(ellipse at 50% 0%, #082118 0%, #030e09 70%);
+  --rh-panel: #091713;
+  --rh-panel-dark: #050f0c;
+  --rh-border: #1a382d;
+  --rh-border-light: #2c5949;
   
-  --rh-orange: #d95328;
-  --rh-orange-bright: #f06435;
-  --rh-text: #e8decb;
-  --rh-muted: #9e9386;
+  /* Gold- & Highlight-Töne */
+  --rh-gold: #e5ba55;
+  --rh-gold-bright: #f5d175;
+  --rh-gold-glow: rgba(229, 186, 85, 0.35);
+  
+  /* Text & Muted */
+  --rh-text: #e7eedd;
+  --rh-muted: #8d9e96;
+  
+  /* Status */
+  --rh-rate-active: #8b2518;
+  --rh-rate-border: #e5ba55;
 }
 
 * { box-sizing: border-box; }
 
 body {
-  background-color: var(--rh-bg);
+  background: var(--rh-bg-gradient), var(--rh-bg);
+  background-attachment: fixed;
   color: var(--rh-text);
   font-family: 'Inter', Arial, sans-serif;
   margin: 0;
@@ -26,11 +40,11 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Banner: Desktop vs. Mobile */
+/* Banner */
 html body header.hero {
   aspect-ratio: 2048 / 379 !important;
-  background: #080b0d url("assets/festival-banner.webp") center / 100% 100% no-repeat !important;
-  border-bottom: 2px solid #5a2e20;
+  background: #030e09 url("assets/festival-banner.webp") center / 100% 100% no-repeat !important;
+  border-bottom: 2px solid #1a382d;
 }
 
 @media (max-width: 768px) {
@@ -38,6 +52,7 @@ html body header.hero {
     aspect-ratio: 1564 / 739 !important;
     background-image: url("assets/festival-banner-mobile.webp") !important;
     background-size: cover !important;
+    background-position: center center !important;
   }
 }
 
@@ -47,19 +62,47 @@ html body header.hero {
   top: 0;
   z-index: 50;
   display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, #0b1c16, #05100c);
+  border-bottom: 2px solid var(--rh-border);
+  box-shadow: 0 4px 18px rgba(0,0,0,0.85);
+}
+
+.topnav-top-row {
+  display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 56px;
-  padding: 0 16px;
-  background: linear-gradient(180deg, #181d21, #0d1012);
-  border-bottom: 2px solid #38271e;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.7);
+  padding: 8px 16px;
+  width: 100%;
 }
 
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+  padding: 0 16px 8px;
+}
+
+.nav-links button {
+  background: transparent;
+  border: 1px solid transparent;
+  color: #c0cfc8;
+  padding: 8px 14px;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.nav-links button:hover,
+.nav-links button.active {
+  background: #0d271f;
+  border-color: var(--rh-gold);
+  color: var(--rh-gold-bright);
+  box-shadow: 0 0 10px var(--rh-gold-glow);
 }
 
 .nav-brand {
@@ -68,7 +111,7 @@ html body header.hero {
   gap: 8px;
   font-family: "Barlow Condensed", sans-serif;
   font-weight: 900;
-  font-size: 24px;
+  font-size: 26px;
   letter-spacing: 1px;
 }
 
@@ -76,19 +119,24 @@ button.nav-brand {
   background: transparent;
   border: 0;
   cursor: pointer;
-  padding: 0 8px;
+  padding: 0;
   color: inherit;
+  transition: transform 0.15s ease;
+}
+
+button.nav-brand:hover {
+  transform: scale(1.03);
 }
 
 .brand-icon-stag {
   display: inline-block;
-  width: 24px;
-  height: 28px;
+  width: 26px;
+  height: 30px;
   background: transparent url("assets/stag-skull-clean.png") center / contain no-repeat;
-  filter: drop-shadow(0 0 6px var(--rh-orange));
+  filter: drop-shadow(0 0 6px var(--rh-gold));
 }
 
-.orange { color: var(--rh-orange); }
+.gold { color: var(--rh-gold); }
 
 .nav-badge {
   display: inline-block;
@@ -96,9 +144,9 @@ button.nav-brand {
   padding: 1px 6px;
   font-size: 11px;
   border-radius: 10px;
-  background: #1c2125;
-  border: 1px solid #443228;
-  color: var(--rh-orange);
+  background: #081a14;
+  border: 1px solid var(--rh-border);
+  color: var(--rh-gold);
 }
 
 .nav-tools {
@@ -107,14 +155,20 @@ button.nav-brand {
 }
 
 .nav-tools button {
-  background: #181c1f;
-  border: 1px solid #3d2a20;
+  background: #091a14;
+  border: 1px solid var(--rh-border);
   color: var(--rh-text);
-  padding: 6px 10px;
+  padding: 6px 12px;
   border-radius: 4px;
   font-size: 11px;
   font-weight: 700;
   cursor: pointer;
+  transition: all 0.15s;
+}
+
+.nav-tools button:hover {
+  border-color: var(--rh-gold);
+  color: var(--rh-gold);
 }
 
 /* 2-Spalten Layout Desktop */
@@ -131,8 +185,8 @@ button.nav-brand {
 /* Festivaltage */
 .festival-days {
   padding: 10px 16px;
-  background: #080a0c;
-  border-bottom: 1px solid #281d17;
+  background: #04100b;
+  border-bottom: 1px solid #142a22;
 }
 
 .festival-days-inner {
@@ -149,8 +203,8 @@ button.festival-day {
   align-items: center;
   gap: 12px;
   padding: 10px 14px;
-  background: linear-gradient(135deg, rgba(255,255,255,0.015), #101416 70%);
-  border: 1px solid #2e2019;
+  background: linear-gradient(135deg, rgba(255,255,255,0.02), #091713 70%);
+  border: 1px solid #19382e;
   border-radius: 4px;
   cursor: pointer;
   text-align: left;
@@ -160,10 +214,11 @@ button.festival-day {
 button.festival-day:hover {
   border-color: var(--day-color);
   transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.6);
 }
 
 button.festival-day.active-day {
-  background: linear-gradient(135deg, color-mix(in srgb, var(--day-color) 25%, #151a1d), #0e1113);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--day-color) 25%, #081d16), #06110d);
   border-color: var(--day-color);
   box-shadow: 0 0 16px color-mix(in srgb, var(--day-color) 40%, transparent);
 }
@@ -190,30 +245,31 @@ button.festival-day.active-day {
 
 .festival-day small {
   font-size: 10px;
-  color: #b8aaa0;
+  color: #a4b5ad;
   display: block;
   margin-top: 2px;
 }
 
-/* Toolbar & Heading */
+/* Heading & Toolbar */
 .heading-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid #2e2019;
+  border-bottom: 1px solid var(--rh-border);
   padding-bottom: 12px;
   margin-bottom: 16px;
 }
 
 .heading-row h2 {
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 32px;
+  font-size: 34px;
   margin: 0;
   letter-spacing: 1px;
+  color: #fff;
 }
 
-.heading-row h2 em { color: var(--rh-orange); font-style: normal; }
-.heading-row p { margin: 4px 0 0; font-size: 11px; color: var(--rh-muted); letter-spacing: 0.5px; }
+.heading-row h2 em { color: var(--rh-gold); font-style: normal; }
+.heading-row p { margin: 4px 0 0; font-size: 12px; color: var(--rh-muted); letter-spacing: 0.5px; }
 
 .toolbar-inline {
   display: flex;
@@ -222,23 +278,25 @@ button.festival-day.active-day {
 }
 
 .day-reset-btn {
-  background: #2b1712;
-  border: 1px solid var(--rh-orange);
-  color: #ffb89f;
+  background: #10261f;
+  border: 1px solid var(--rh-gold);
+  color: var(--rh-gold-bright);
   border-radius: 4px;
-  padding: 0 10px;
-  height: 34px;
+  padding: 0 12px;
+  height: 36px;
   font-size: 11px;
   font-weight: 700;
   cursor: pointer;
+  transition: all 0.15s;
 }
+.day-reset-btn:hover { background: #183d31; }
 
 .toolbar-inline .search {
-  background: #111518;
-  border: 1px solid #3d2d24;
+  background: #06140f;
+  border: 1px solid var(--rh-border);
   border-radius: 4px;
   color: #fff;
-  height: 34px;
+  height: 36px;
   display: flex;
   align-items: center;
   padding: 0 10px;
@@ -250,7 +308,7 @@ button.festival-day.active-day {
   border: 0;
   color: #fff;
   outline: none;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 /* Band-Grid */
@@ -263,25 +321,25 @@ button.festival-day.active-day {
 /* Bandkarte */
 .concept-card {
   position: relative;
-  background: #101416;
-  border: 1px solid #38271e;
-  border-radius: 4px;
+  background: var(--rh-panel);
+  border: 1px solid var(--rh-border);
+  border-radius: 5px;
   overflow: hidden;
   cursor: pointer;
   user-select: none;
-  transition: transform 0.15s, border-color 0.15s;
+  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
 }
 
 .concept-card:hover, .concept-card.active-selected {
-  border-color: var(--rh-orange);
+  border-color: var(--rh-gold);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.7), 0 0 10px var(--rh-gold-glow);
 }
 
 .concept-card-img-wrap {
   position: relative;
   height: 160px;
-  background: radial-gradient(circle at 50% 35%, #381f17, #0e1214 75%);
+  background: radial-gradient(circle at 50% 35%, #0e271f, #05120d 75%);
   overflow: hidden;
 }
 
@@ -297,11 +355,11 @@ button.festival-day.active-day {
   transform: scale(1.05);
 }
 
-.concept-card-body { padding: 10px; }
+.concept-card-body { padding: 12px; }
 
 .concept-card-name {
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 20px;
+  font-size: 21px;
   font-weight: 800;
   text-transform: uppercase;
   margin: 0;
@@ -309,7 +367,7 @@ button.festival-day.active-day {
 }
 
 .concept-card:hover .concept-card-name {
-  color: var(--rh-orange-bright);
+  color: var(--rh-gold-bright);
 }
 
 .concept-card-genre {
@@ -325,32 +383,38 @@ button.festival-day.active-day {
   gap: 6px;
   margin-top: 10px;
   padding-top: 8px;
-  border-top: 1px solid #241a14;
+  border-top: 1px solid #11281f;
 }
 
 .concept-card-ratings button {
-  background: #181d20;
-  border: 1px solid #33241b;
+  background: #0b1f18;
+  border: 1px solid #1a3c30;
   border-radius: 3px;
-  color: #bfb2a5;
+  color: #b2c4bc;
   padding: 8px 0;
   font-size: 15px;
   cursor: pointer;
+  transition: all 0.15s;
+}
+
+.concept-card-ratings button:hover {
+  background: #14362a;
+  border-color: var(--rh-gold);
 }
 
 .concept-card-ratings button.active {
-  background: #5a2315;
-  border-color: var(--rh-orange);
+  background: var(--rh-rate-active);
+  border-color: var(--rh-rate-border);
   color: #fff;
-  box-shadow: inset 0 0 6px rgba(217, 83, 40, 0.4);
+  box-shadow: 0 0 8px rgba(229, 186, 85, 0.4);
 }
 
 /* Detail Drawer (Desktop) */
 .band-detail-drawer {
   position: sticky;
-  top: 76px;
-  background: #0f1315;
-  border: 1px solid #38271e;
+  top: 100px;
+  background: #081712;
+  border: 1px solid var(--rh-border);
   border-radius: 6px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.85);
   z-index: 40;
@@ -364,7 +428,7 @@ button.festival-day.active-day {
   right: 10px;
   z-index: 10;
   background: rgba(0,0,0,0.65);
-  border: 1px solid rgba(255,255,255,0.25);
+  border: 1px solid var(--rh-border);
   color: #fff;
   width: 28px;
   height: 28px;
@@ -375,7 +439,7 @@ button.festival-day.active-day {
 .drawer-header-art {
   position: relative;
   height: 180px;
-  background: #151a1d;
+  background: #0c2019;
   overflow: hidden;
 }
 
@@ -392,13 +456,14 @@ button.festival-day.active-day {
   left: 14px;
   margin: 0;
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 32px;
+  font-size: 34px;
   font-weight: 900;
   text-shadow: 0 2px 10px #000, 0 0 20px #000;
   letter-spacing: 1px;
+  color: #fff;
 }
 
-.drawer-content { padding: 12px 14px; }
+.drawer-content { padding: 14px; }
 
 .drawer-meta-line {
   display: flex;
@@ -411,18 +476,20 @@ button.festival-day.active-day {
 
 .drawer-website-btn {
   font-size: 11px;
-  color: var(--rh-orange);
+  color: var(--rh-gold);
   text-decoration: none;
-  border: 1px solid #3d2a20;
+  border: 1px solid var(--rh-border);
   padding: 4px 8px;
   border-radius: 3px;
-  background: #171c1f;
+  background: #0c221a;
+  transition: all 0.15s;
 }
+.drawer-website-btn:hover { border-color: var(--rh-gold); color: #fff; }
 
 .drawer-desc-block p {
   font-size: 12px;
-  line-height: 1.45;
-  color: #cec1b3;
+  line-height: 1.5;
+  color: #c7d6ce;
   margin: 0;
 }
 
@@ -436,7 +503,7 @@ button.festival-day.active-day {
 .desc-expand-link {
   background: transparent;
   border: 0;
-  color: var(--rh-orange);
+  color: var(--rh-gold);
   font-size: 11px;
   padding: 4px 0 0;
   cursor: pointer;
@@ -444,10 +511,10 @@ button.festival-day.active-day {
 
 .drawer-section-title {
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 800;
   letter-spacing: 1px;
-  color: var(--rh-orange);
+  color: var(--rh-gold);
   margin: 14px 0 8px;
   display: flex;
   justify-content: space-between;
@@ -460,9 +527,9 @@ button.festival-day.active-day {
 }
 
 .drawer-ratings-block button {
-  background: #161b1e;
-  border: 1px solid #38271e;
-  color: #d1c4b7;
+  background: #0c2019;
+  border: 1px solid var(--rh-border);
+  color: #c6d6ce;
   padding: 8px 4px;
   font-size: 12px;
   border-radius: 3px;
@@ -470,8 +537,8 @@ button.festival-day.active-day {
 }
 
 .drawer-ratings-block button.active {
-  background: #552115;
-  border-color: var(--rh-orange);
+  background: var(--rh-rate-active);
+  border-color: var(--rh-gold);
   color: #fff;
 }
 
@@ -483,15 +550,15 @@ button.festival-day.active-day {
   grid-template-columns: 34px 28px 1fr auto 36px;
   align-items: center;
   gap: 8px;
-  background: #121619;
-  border: 1px solid #2d2019;
+  background: #0b1a14;
+  border: 1px solid var(--rh-border);
   border-radius: 4px;
   padding: 6px 8px;
 }
 
 .drawer-song-row.playing {
-  border-color: var(--rh-orange);
-  background: #231613;
+  border-color: var(--rh-gold);
+  background: #112d22;
 }
 
 .song-skull-icon {
@@ -501,9 +568,9 @@ button.festival-day.active-day {
 }
 
 .song-play-btn {
-  background: #21272b;
-  border: 1px solid #3d2a20;
-  color: #ffaa7a;
+  background: #14352a;
+  border: 1px solid var(--rh-border);
+  color: var(--rh-gold);
   width: 28px;
   height: 28px;
   border-radius: 50%;
@@ -515,14 +582,14 @@ button.festival-day.active-day {
 
 .drawer-song-row[aria-busy="true"] .song-play-btn {
   animation: rh-pulse 0.8s infinite alternate;
-  color: var(--rh-orange);
+  color: var(--rh-gold);
 }
 
 @keyframes rh-pulse { from { opacity: 0.3; } to { opacity: 1; } }
 
 .song-titles strong { display: block; font-size: 12px; color: #fff; }
 .song-titles small { font-size: 10px; color: var(--rh-muted); }
-.song-duration { font-size: 11px; color: #887a70; }
+.song-duration { font-size: 11px; color: #7f948b; }
 
 .song-waveform {
   display: none;
@@ -536,7 +603,7 @@ button.festival-day.active-day {
 .song-waveform span {
   width: 2px;
   height: 100%;
-  background: var(--rh-orange-bright);
+  background: var(--rh-gold-bright);
   animation: rh-bar 0.8s ease-in-out infinite alternate;
 }
 .song-waveform span:nth-child(2) { animation-delay: 0.2s; height: 60%; }
@@ -554,27 +621,56 @@ button.festival-day.active-day {
     margin-top: 12px;
   }
 
-  /* Navigation: Kein Umbrechen mehr */
+  /* Navigation: Kein horizontales Scrollen mehr! */
   .topnav {
-    padding: 0 10px;
-    min-height: 50px;
-    overflow-x: auto;
-    scrollbar-width: none;
+    padding: 0;
   }
-  .topnav::-webkit-scrollbar { display: none; }
 
-  .nav-brand { font-size: 20px; padding: 0 4px; }
-  .brand-icon-stag { width: 20px; height: 24px; }
+  .topnav-top-row {
+    padding: 6px 12px;
+  }
+
+  .nav-brand { font-size: 22px; }
+  .brand-icon-stag { width: 22px; height: 26px; }
+
+  /* 4er Rasterleiste: Teilt sich die 100% Breite perfekt auf */
+  .nav-links {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    padding: 0 8px 8px;
+    width: 100%;
+  }
 
   .nav-links button {
-    padding: 6px 8px;
-    font-size: 12px;
-    white-space: nowrap;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 2px;
+    font-size: 10px;
+    line-height: 1.1;
+    text-align: center;
+    border-radius: 4px;
+    min-height: 42px;
   }
-  .nav-tools button span { display: none; }
-  .nav-tools button { padding: 6px 8px; font-size: 13px; }
 
-  /* Festivaltage: Kompaktes 2x2 Grid auf Mobile */
+  .nav-links button span {
+    font-size: 14px;
+    margin-bottom: 2px;
+  }
+
+  .nav-badge {
+    margin-left: 0;
+    margin-top: 2px;
+    font-size: 9px;
+    padding: 0 4px;
+  }
+
+  .nav-tools button span { display: none; }
+  .nav-tools button { padding: 5px 8px; font-size: 13px; }
+
+  /* Festivaltage: 2x2 Grid */
   .festival-days { padding: 8px 10px; }
   .festival-days-inner {
     grid-template-columns: repeat(2, 1fr);
@@ -588,7 +684,7 @@ button.festival-day.active-day {
   .festival-day strong { font-size: 16px; }
   .festival-day small { font-size: 9px; }
 
-  /* Band-Grid: 2 Spalten auf Smartphones */
+  /* Band-Grid: 2 Spalten */
   .band-grid-concept {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
@@ -607,7 +703,7 @@ button.festival-day.active-day {
   .drawer-backdrop {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.75);
+    background: rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(4px);
     z-index: 90;
     transition: opacity 0.25s ease;
@@ -621,13 +717,13 @@ button.festival-day.active-day {
     top: auto;
     max-height: 85vh;
     border-radius: 16px 16px 0 0;
-    border: 1px solid #4a3429;
+    border: 1px solid var(--rh-border);
     border-bottom: 0;
-    background: #0f1315;
+    background: #071510;
     z-index: 100;
     overflow-y: auto;
     overscroll-behavior: contain;
-    box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.9);
+    box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.95);
     transform: translateY(0);
     transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
   }
@@ -642,7 +738,7 @@ button.festival-day.active-day {
     display: block;
     width: 42px;
     height: 4px;
-    background: #554135;
+    background: #1e3f33;
     border-radius: 3px;
     margin: 8px auto 6px;
   }

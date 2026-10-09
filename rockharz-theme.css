@@ -1,8 +1,5 @@
 /* =========================================================
-   ROCKHARZ OFFICIAL COLOR SCHEME ALIGNMENT
-   Deep Coal (#090b0d), Teufelsmauer-Orange (#d95328),
-   Forged Iron (#15191c) & Pergament (#e8decb)
-   FIX: Freies, flüssiges Scrollen über dem Player
+   ROCKHARZ OFFICIAL COLOR SCHEME & MOBILE-FIRST OPTIMIZATION
    ========================================================= */
 
 :root {
@@ -18,18 +15,30 @@
   --rh-muted: #9e9386;
 }
 
+* { box-sizing: border-box; }
+
 body {
   background-color: var(--rh-bg);
   color: var(--rh-text);
   font-family: 'Inter', Arial, sans-serif;
   margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* Banner */
+/* Banner: Desktop vs. Mobile */
 html body header.hero {
   aspect-ratio: 2048 / 379 !important;
   background: #080b0d url("assets/festival-banner.webp") center / 100% 100% no-repeat !important;
   border-bottom: 2px solid #5a2e20;
+}
+
+@media (max-width: 768px) {
+  html body header.hero {
+    aspect-ratio: 1564 / 739 !important;
+    background-image: url("assets/festival-banner-mobile.webp") !important;
+    background-size: cover !important;
+  }
 }
 
 /* Navigation */
@@ -39,11 +48,18 @@ html body header.hero {
   z-index: 50;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   min-height: 56px;
   padding: 0 16px;
   background: linear-gradient(180deg, #181d21, #0d1012);
   border-bottom: 2px solid #38271e;
   box-shadow: 0 4px 15px rgba(0,0,0,0.7);
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .nav-brand {
@@ -52,7 +68,7 @@ html body header.hero {
   gap: 8px;
   font-family: "Barlow Condensed", sans-serif;
   font-weight: 900;
-  font-size: 26px;
+  font-size: 24px;
   letter-spacing: 1px;
 }
 
@@ -60,20 +76,14 @@ button.nav-brand {
   background: transparent;
   border: 0;
   cursor: pointer;
-  padding: 0 10px;
+  padding: 0 8px;
   color: inherit;
-  transition: transform 0.15s ease;
-}
-
-button.nav-brand:hover {
-  transform: scale(1.03);
-  filter: brightness(1.2);
 }
 
 .brand-icon-stag {
   display: inline-block;
-  width: 26px;
-  height: 30px;
+  width: 24px;
+  height: 28px;
   background: transparent url("assets/stag-skull-clean.png") center / contain no-repeat;
   filter: drop-shadow(0 0 6px var(--rh-orange));
 }
@@ -82,7 +92,7 @@ button.nav-brand:hover {
 
 .nav-badge {
   display: inline-block;
-  margin-left: 6px;
+  margin-left: 4px;
   padding: 1px 6px;
   font-size: 11px;
   border-radius: 10px;
@@ -91,7 +101,23 @@ button.nav-brand:hover {
   color: var(--rh-orange);
 }
 
-/* 2-Spalten Layout */
+.nav-tools {
+  display: flex;
+  gap: 6px;
+}
+
+.nav-tools button {
+  background: #181c1f;
+  border: 1px solid #3d2a20;
+  color: var(--rh-text);
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* 2-Spalten Layout Desktop */
 .layout-two-col {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 410px;
@@ -134,25 +160,13 @@ button.festival-day {
 button.festival-day:hover {
   border-color: var(--day-color);
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(0,0,0,0.6);
 }
 
 button.festival-day.active-day {
   background: linear-gradient(135deg, color-mix(in srgb, var(--day-color) 25%, #151a1d), #0e1113);
   border-color: var(--day-color);
-  box-shadow: 0 0 18px color-mix(in srgb, var(--day-color) 40%, transparent), inset 0 0 10px rgba(0,0,0,0.8);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--day-color) 40%, transparent);
 }
-
-.festival-day::before, .festival-day::after {
-  content: "";
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  pointer-events: none;
-  border-color: var(--day-color);
-}
-.festival-day::before { top: 2px; left: 2px; border-top: 1px solid; border-left: 1px solid; }
-.festival-day::after { bottom: 2px; right: 2px; border-bottom: 1px solid; border-right: 1px solid; }
 
 .festival-day-wednesday { --day-color: #d95328; }
 .festival-day-thursday { --day-color: #38b4f2; }
@@ -160,8 +174,8 @@ button.festival-day.active-day {
 .festival-day-saturday { --day-color: #b56ff0; }
 
 .festival-day .day-symbol {
-  width: 44px;
-  height: 48px;
+  width: 40px;
+  height: 44px;
   flex-shrink: 0;
   background: transparent url("assets/stag-skull-clean.png") center/contain no-repeat;
   filter: drop-shadow(0 0 5px var(--day-color));
@@ -170,7 +184,7 @@ button.festival-day.active-day {
 .festival-day strong {
   color: var(--day-color);
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 20px;
+  font-size: 19px;
   letter-spacing: 0.5px;
 }
 
@@ -181,7 +195,7 @@ button.festival-day.active-day {
   margin-top: 2px;
 }
 
-/* Heading & Toolbar */
+/* Toolbar & Heading */
 .heading-row {
   display: flex;
   align-items: center;
@@ -217,9 +231,7 @@ button.festival-day.active-day {
   font-size: 11px;
   font-weight: 700;
   cursor: pointer;
-  transition: background 0.15s;
 }
-.day-reset-btn:hover { background: #442017; }
 
 .toolbar-inline .search {
   background: #111518;
@@ -241,10 +253,10 @@ button.festival-day.active-day {
   font-size: 12px;
 }
 
-/* Grid */
+/* Band-Grid */
 .band-grid-concept {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
   gap: 16px;
 }
 
@@ -268,10 +280,9 @@ button.festival-day.active-day {
 
 .concept-card-img-wrap {
   position: relative;
-  height: 165px;
+  height: 160px;
   background: radial-gradient(circle at 50% 35%, #381f17, #0e1214 75%);
   overflow: hidden;
-  cursor: pointer;
 }
 
 .concept-card-img-wrap img {
@@ -286,20 +297,15 @@ button.festival-day.active-day {
   transform: scale(1.05);
 }
 
-.concept-card-body {
-  padding: 10px;
-  cursor: pointer;
-}
+.concept-card-body { padding: 10px; }
 
 .concept-card-name {
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 21px;
+  font-size: 20px;
   font-weight: 800;
   text-transform: uppercase;
   margin: 0;
   color: var(--rh-text);
-  cursor: pointer;
-  transition: color 0.15s;
 }
 
 .concept-card:hover .concept-card-name {
@@ -310,7 +316,6 @@ button.festival-day.active-day {
   font-size: 12px;
   color: var(--rh-muted);
   margin-top: 2px;
-  cursor: pointer;
 }
 
 /* Rating-Buttons */
@@ -328,15 +333,9 @@ button.festival-day.active-day {
   border: 1px solid #33241b;
   border-radius: 3px;
   color: #bfb2a5;
-  padding: 6px 0;
-  font-size: 14px;
+  padding: 8px 0;
+  font-size: 15px;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
-}
-
-.concept-card-ratings button:hover {
-  background: #281a14;
-  border-color: #553526;
 }
 
 .concept-card-ratings button.active {
@@ -346,19 +345,18 @@ button.festival-day.active-day {
   box-shadow: inset 0 0 6px rgba(217, 83, 40, 0.4);
 }
 
-/* =========================================================
-   RECHTES DETAIL-PANEL (FIXIERTES STICKY OHNE SCROLL-LOCK)
-   ========================================================= */
+/* Detail Drawer (Desktop) */
 .band-detail-drawer {
   position: sticky;
   top: 76px;
-  /* Kein overscroll-behavior: contain und kein erzwungenes internes Scrollen,
-     damit das Mausrad die ganze Seite ungehindert weiterscrollt! */
   background: #0f1315;
   border: 1px solid #38271e;
   border-radius: 6px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.85);
+  z-index: 40;
 }
+
+.drawer-handle { display: none; }
 
 .drawer-close {
   position: absolute;
@@ -465,7 +463,7 @@ button.festival-day.active-day {
   background: #161b1e;
   border: 1px solid #38271e;
   color: #d1c4b7;
-  padding: 7px 4px;
+  padding: 8px 4px;
   font-size: 12px;
   border-radius: 3px;
   cursor: pointer;
@@ -477,7 +475,7 @@ button.festival-day.active-day {
   color: #fff;
 }
 
-/* Player Zeilen */
+/* Sound Check Player */
 .drawer-songs-list { display: grid; gap: 6px; }
 
 .drawer-song-row {
@@ -488,7 +486,7 @@ button.festival-day.active-day {
   background: #121619;
   border: 1px solid #2d2019;
   border-radius: 4px;
-  padding: 5px 8px;
+  padding: 6px 8px;
 }
 
 .drawer-song-row.playing {
@@ -506,8 +504,8 @@ button.festival-day.active-day {
   background: #21272b;
   border: 1px solid #3d2a20;
   color: #ffaa7a;
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   display: grid;
   place-items: center;
@@ -544,27 +542,124 @@ button.festival-day.active-day {
 .song-waveform span:nth-child(2) { animation-delay: 0.2s; height: 60%; }
 .song-waveform span:nth-child(3) { animation-delay: 0.4s; height: 80%; }
 .song-waveform span:nth-child(4) { animation-delay: 0.1s; height: 40%; }
-
 @keyframes rh-bar { 0% { transform: scaleY(0.3); } 100% { transform: scaleY(1); } }
 
-/* Responsive Breakpoints */
-@media (max-width: 1100px) {
-  .layout-two-col { grid-template-columns: 1fr; }
+/* =========================================================
+   DEDIZIERTE MOBILE APP-ANSICHT (UNTER 900PX)
+   ========================================================= */
+@media (max-width: 900px) {
+  .layout-two-col {
+    display: block;
+    padding: 0 12px;
+    margin-top: 12px;
+  }
+
+  /* Navigation: Kein Umbrechen mehr */
+  .topnav {
+    padding: 0 10px;
+    min-height: 50px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .topnav::-webkit-scrollbar { display: none; }
+
+  .nav-brand { font-size: 20px; padding: 0 4px; }
+  .brand-icon-stag { width: 20px; height: 24px; }
+
+  .nav-links button {
+    padding: 6px 8px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .nav-tools button span { display: none; }
+  .nav-tools button { padding: 6px 8px; font-size: 13px; }
+
+  /* Festivaltage: Kompaktes 2x2 Grid auf Mobile */
+  .festival-days { padding: 8px 10px; }
+  .festival-days-inner {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  button.festival-day {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+  .festival-day .day-symbol { width: 32px; height: 36px; }
+  .festival-day strong { font-size: 16px; }
+  .festival-day small { font-size: 9px; }
+
+  /* Band-Grid: 2 Spalten auf Smartphones */
+  .band-grid-concept {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .concept-card-img-wrap { height: 135px; }
+  .concept-card-name { font-size: 16px; line-height: 1.1; }
+  .concept-card-genre { font-size: 11px; }
+  .concept-card-ratings button { padding: 9px 0; font-size: 14px; }
+
+  /* Toolbar */
+  .heading-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .toolbar-inline { width: 100%; }
+  .toolbar-inline .search { flex: 1; }
+
+  /* DETAIL-DRAWER: Nativer Bottom-Sheet */
+  .drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(4px);
+    z-index: 90;
+    transition: opacity 0.25s ease;
+  }
+
   .band-detail-drawer {
     position: fixed;
+    left: 0;
     right: 0;
-    top: 0;
     bottom: 0;
-    width: 380px;
-    height: 100vh;
-    overflow-y: auto;
+    top: auto;
+    max-height: 85vh;
+    border-radius: 16px 16px 0 0;
+    border: 1px solid #4a3429;
+    border-bottom: 0;
+    background: #0f1315;
     z-index: 100;
-    border-radius: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.9);
+    transform: translateY(0);
+    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
   }
-  .band-detail-drawer.hidden { display: none; }
+
+  .band-detail-drawer.hidden {
+    display: block !important;
+    transform: translateY(105%);
+    pointer-events: none;
+  }
+
+  .drawer-handle {
+    display: block;
+    width: 42px;
+    height: 4px;
+    background: #554135;
+    border-radius: 3px;
+    margin: 8px auto 6px;
+  }
+
+  .drawer-close {
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+
+  .drawer-header-art { height: 160px; }
+  .drawer-header-art h2 { font-size: 26px; }
 }
 
-@media (max-width: 768px) {
-  .festival-days-inner { grid-template-columns: repeat(2, 1fr); }
-  .band-detail-drawer { width: 100%; }
+@media (max-width: 400px) {
+  .band-grid-concept { grid-template-columns: 1fr; }
+  .concept-card-img-wrap { height: 160px; }
 }

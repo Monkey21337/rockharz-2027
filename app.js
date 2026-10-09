@@ -1,9 +1,9 @@
 "use strict";
 
 /* ROCKHARZ 2027 — DEFINITIVE ENGINE
-   - Exakte Song-Zuordnung ohne falsche Track-1-Fallbacks
-   - Stoppt ehrlich mit "Hörprobe nicht verfügbar", wenn Store keinen Stream liefert
-   - Volle Klickbarkeit auf Bandkarten mit Gesichtsfokus
+   - Mobile Bottom-Sheet Steuerung & Backdrop
+   - Volle Klickbarkeit auf allen Geräten
+   - Exakte Songprüfung ohne falsche Tracks
 */
 
 const KEY = "rockharz2027_favorites_v1";
@@ -128,7 +128,6 @@ function loadCardPhotos() {
 
 /* ---------------------------------------------------------
    AUDIO ENGINE (Apple Music / iTunes API)
-   Strikte Prüfung: Spielt NUR den tatsächlich gesuchten Track!
    --------------------------------------------------------- */
 const cleanStr = val =>
   String(val || "")
@@ -175,7 +174,6 @@ async function findStudioAudio(band, song) {
     .replace(/å/g, "a").replace(/Å/g, "A")
     .replace(/ø/g, "o").replace(/Ø/g, "O");
 
-  // 1. Suche in DE und US nach Band + Song
   for (const country of ["DE", "US"]) {
     try {
       const results = await queryItunes({
@@ -194,7 +192,6 @@ async function findStudioAudio(band, song) {
     } catch (e) {}
   }
 
-  // 2. Suche in Künstler-Titeln nach exaktem Songtitel
   try {
     const artistResults = await queryItunes({
       term: cleanBandName,
@@ -211,7 +208,6 @@ async function findStudioAudio(band, song) {
     }
   } catch (e) {}
 
-  // Wenn nicht gefunden: NULL! Kein falscher Fallback auf Song 1!
   previewCache.set(cacheKey, null);
   return null;
 }
@@ -234,7 +230,6 @@ async function toggleSongPlay(index) {
   const playBtn = row?.querySelector(".song-play-btn");
   const stateText = row?.querySelector(".song-state-text");
 
-  // Wenn derselbe Song läuft -> Pause
   if (currentSongIndex === index && currentAudio && !currentAudio.paused) {
     currentAudio.pause();
     row?.classList.remove("playing");
@@ -243,7 +238,6 @@ async function toggleSongPlay(index) {
     return;
   }
 
-  // Wenn derselbe Song pausiert ist -> Fortsetzen
   if (currentSongIndex === index && currentAudio && currentAudio.paused) {
     try {
       await currentAudio.play();
@@ -256,7 +250,6 @@ async function toggleSongPlay(index) {
     return;
   }
 
-  // Neuen Track vorbereiten
   stopCurrentAudio();
   const thisRequest = ++playRequestId;
   currentSongIndex = index;
@@ -278,7 +271,6 @@ async function toggleSongPlay(index) {
 
   if (row) row.removeAttribute("aria-busy");
 
-  // Wenn der Song nicht existiert: Ehrlich stoppen, NIEMALS einen falschen Song anspielen!
   if (!track || !track.previewUrl) {
     if (stateText) stateText.textContent = "Hörprobe nicht verfügbar";
     if (playBtn) playBtn.textContent = "×";
@@ -428,6 +420,15 @@ function resetToAllBands() {
   render();
 }
 
+function closeDrawer() {
+  stopCurrentAudio();
+  $("detail-drawer").classList.add("hidden");
+  const backdrop = $("drawer-backdrop");
+  if (backdrop) backdrop.classList.add("hidden");
+  activeBand = null;
+  render();
+}
+
 function openBand(band) {
   stopCurrentAudio();
   currentSongIndex = -1;
@@ -437,7 +438,11 @@ function openBand(band) {
   $("detail-genre").textContent = band.genre;
   $("detail-website").href = band.website;
   $("detail-desc").textContent = band.description;
+  
+  // Drawer & Mobile Backdrop öffnen
   $("detail-drawer").classList.remove("hidden");
+  const backdrop = $("drawer-backdrop");
+  if (backdrop) backdrop.classList.remove("hidden");
 
   getBandPhoto(band).then(src => {
     $("detail-img").src = src || "assets/all-for-metal-art.webp";
@@ -503,7 +508,7 @@ document.addEventListener("click", e => {
     return;
   }
 
-  // 2. Band-Auswahl über Karte
+  // 2. Band-Auswahl
   const card = e.target.closest(".concept-card");
   if (card) {
     const bandId = card.dataset.bandId;
@@ -560,12 +565,10 @@ if (resetViewBtn) {
   resetViewBtn.onclick = resetToAllBands;
 }
 
-$("drawer-close-btn").onclick = () => {
-  stopCurrentAudio();
-  $("detail-drawer").classList.add("hidden");
-  activeBand = null;
-  render();
-};
+// Schließen des Drawers (Button & Klick auf Backdrop)
+$("drawer-close-btn").onclick = closeDrawer;
+const backdrop = $("drawer-backdrop");
+if (backdrop) backdrop.onclick = closeDrawer;
 
 $("desc-expand-btn").onclick = () => {
   const p = $("detail-desc");
@@ -607,6 +610,7 @@ $("import-file").onchange = async event => {
 
 // Start
 render();
-if (BANDS.length > 0) {
-  openBand(BANDS.find(b => b.id === "accept") || BANDS[0]);
+// Auf Desktop automatisch Accept öffnen, auf Mobile Drawer standardmäßig zu lassen
+if (window.innerWidth > 900 && BANDS.length > 0) {
+  openBand(BANDS[0]);
 }

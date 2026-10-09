@@ -2,18 +2,18 @@
 <html lang="de">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#090b0d">
   <title>ROCKHARZ 2027 · Rock statt Reha</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=70">
-  <link rel="stylesheet" href="rockharz-theme.css?v=70">
+  <link rel="stylesheet" href="style.css?v=80">
+  <link rel="stylesheet" href="rockharz-theme.css?v=80">
 </head>
 <body>
 
-  <!-- HERO BANNER -->
+  <!-- HERO BANNER (Responsive via CSS) -->
   <header class="hero" id="top"></header>
 
   <!-- HAUPTNAVIGATION -->
@@ -23,14 +23,16 @@
       <span>RH<span class="orange">27</span></span>
     </button>
 
-    <button data-page="lineup" class="active"><span>☠</span> LINE-UP</button>
-    <button data-page="favorites"><span>★</span> MEINE BANDS <b id="nav-count-favorites" class="nav-badge">0</b></button>
-    <button data-page="unrated"><span>◇</span> NOCH OFFEN <b id="nav-count-unrated" class="nav-badge">0</b></button>
-    <button data-page="schedule"><span>▦</span> RUNNING ORDER</button>
+    <div class="nav-links">
+      <button data-page="lineup" class="active"><span>☠</span> LINE-UP</button>
+      <button data-page="favorites"><span>★</span> MEINE BANDS <b id="nav-count-favorites" class="nav-badge">0</b></button>
+      <button data-page="unrated"><span>◇</span> NOCH OFFEN <b id="nav-count-unrated" class="nav-badge">0</b></button>
+      <button data-page="schedule"><span>▦</span> RUNNING ORDER</button>
+    </div>
 
     <div class="nav-tools">
-      <button id="export" title="Auswahl exportieren">⇩ EXPORT</button>
-      <button id="import" title="Auswahl importieren">⇧ IMPORT</button>
+      <button id="export" title="Auswahl exportieren">⇩ <span>EXPORT</span></button>
+      <button id="import" title="Auswahl importieren">⇧ <span>IMPORT</span></button>
       <input id="import-file" type="file" accept="application/json" hidden>
     </div>
   </nav>
@@ -69,7 +71,7 @@
     </div>
   </section>
 
-  <!-- 2-SPALTEN LAYOUT (GRID | DETAIL DRAWER) -->
+  <!-- 2-SPALTEN LAYOUT AUF DESKTOP / APP-FLOW AUF MOBILE -->
   <div class="layout layout-two-col">
 
     <!-- HAUPTINHALT -->
@@ -84,7 +86,7 @@
           </div>
 
           <div class="toolbar-inline">
-            <button id="reset-view-btn" class="day-reset-btn hidden" title="Alle Filter aufheben und zur Komplettansicht">✕ Filter zurücksetzen</button>
+            <button id="reset-view-btn" class="day-reset-btn hidden" title="Filter aufheben">✕ Filter zurücksetzen</button>
             <label class="search">
               <span>⌕</span>
               <input id="search" type="search" placeholder="Band suchen..." autocomplete="off">
@@ -122,27 +124,31 @@
         <div class="heading-row">
           <div>
             <h2>RUNNING <em>ORDER</em></h2>
-            <p>Offizielle Spielzeiten folgen, sobald der Veranstalter sie bestätigt.</p>
+            <p>Offizielle Spielzeiten folgen nach Bestätigung.</p>
           </div>
         </div>
         <div id="schedule" class="schedule"></div>
       </section>
     </main>
 
-    <!-- RECHTES DETAIL-PANEL -->
-    <aside class="band-detail-drawer" id="detail-drawer">
+    <!-- MOBILE BACKDROP FÜR DEN DRAWER -->
+    <div id="drawer-backdrop" class="drawer-backdrop hidden"></div>
+
+    <!-- RECHTES DETAIL-PANEL / MOBILE BOTTOM SHEET -->
+    <aside class="band-detail-drawer hidden" id="detail-drawer">
+      <div class="drawer-handle" aria-hidden="true"></div>
       <button class="drawer-close" id="drawer-close-btn" aria-label="Schließen">✕</button>
       
       <div class="drawer-header-art">
         <img id="detail-img" src="assets/all-for-metal-art.webp" alt="Band Foto">
-        <h2 id="detail-title">ALL FOR METAL</h2>
+        <h2 id="detail-title">ACCEPT</h2>
       </div>
 
       <div class="drawer-content">
         <div class="drawer-meta-line">
           <span class="drawer-genre" id="detail-genre">Heavy Metal</span>
           <a href="#" target="_blank" rel="noopener" class="drawer-website-btn" id="detail-website">
-            Zur Band-Website ↗
+            Band-Website ↗
           </a>
         </div>
 
@@ -164,7 +170,7 @@
 
   </div>
 
-  <script src="bands.js?v=70"></script>
-  <script src="app.js?v=70"></script>
+  <script src="bands.js?v=80"></script>
+  <script src="app.js?v=80"></script>
 </body>
 </html>

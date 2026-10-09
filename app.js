@@ -1,10 +1,15 @@
 "use strict";
 
 /* ROCKHARZ 2027 — DEFINITIVE ENGINE
-   - Mobile Bottom-Sheet Steuerung & Backdrop
-   - Volle Klickbarkeit auf allen Geräten
-   - Exakte Songprüfung ohne falsche Tracks
+   - Ultimate Audio Engine: Tiefe Fallback-Suche über 4 Länder (DE, US, AT, CH)
+   - Bilder-Rettungsschirm: Lädt iTunes HD-Cover, wenn Band keine Wikipedia hat
+   - Nahtlose Audio-Wiedergabe beim Voten
 */
+
+if ("scrollRestoration" in history) {
+  history.scrollRestoration = "manual";
+}
+window.scrollTo(0, 0);
 
 const KEY = "rockharz2027_favorites_v1";
 const $ = id => document.getElementById(id);
@@ -40,74 +45,100 @@ function persist() {
 }
 
 /* ---------------------------------------------------------
-   WIKIPEDIA BAND FOTOS
+   WIKIPEDIA & iTUNES BILD-LADEROUTINE
    --------------------------------------------------------- */
 const WIKI_TITLES = {
-  "Accept": "Accept (band)",
+  "Accept": "Accept_(band)",
   "Alestorm": "Alestorm",
-  "All for Metal": "All for Metal",
-  "Arch Enemy": "Arch Enemy",
-  "Bruce Dickinson": "Bruce Dickinson",
+  "All for Metal": "All_for_Metal",
+  "Arch Enemy": "Arch_Enemy",
+  "Bruce Dickinson": "Bruce_Dickinson",
   "Coppelius": "Coppelius",
-  "Corvus Corax": "Corvus Corax (band)",
-  "D'Artagnan": "dArtagnan (band)",
-  "Dust Bolt": "Dust Bolt",
-  "Eisbrecher": "Eisbrecher (band)",
-  "Emil Bulls": "Emil Bulls",
-  "Equilibrium": "Equilibrium (band)",
-  "Gloryhammer": "Gloryhammer",
-  "Grave Digger": "Grave Digger (band)",
+  "Corvus Corax": "Corvus_Corax_(band)",
+  "D'Artagnan": "DArtagnan_(band)",
+  "Dust Bolt": "Dust_Bolt",
+  "Eisbrecher": "Eisbrecher_(band)",
+  "Emil Bulls": "Emil_Bulls",
+  "Equilibrium": "Equilibrium_(band)",
+  "Grave Digger": "Grave_Digger_(band)",
   "Gutalax": "Gutalax",
   "GWAR": "Gwar",
-  "Håndgemeng": "Håndgemeng",
-  "H-Blockx": "H-Blockx",
-  "Igel vs. Shark": "Igel vs. Shark",
-  "Katerfahrt": "Katerfahrt",
-  "Korpiklaani": "Korpiklaani",
-  "Lord of the Lost": "Lord of the Lost",
-  "Marduk": "Marduk (band)",
-  "Metal Church": "Metal Church",
+  "Lord of the Lost": "Lord_of_the_Lost",
+  "Marduk": "Marduk_(band)",
+  "Metal Church": "Metal_Church",
+  "Nestor": "Nestor_(band)",
   "Setyøursails": "Setyøursails",
   "SKÁLD": "Skáld",
-  "Storm Seeker": "Storm Seeker",
-  "Tankard": "Tankard (band)",
-  "The Sisters of Mercy": "The Sisters of Mercy",
+  "Storm Seeker": "Storm_Seeker",
+  "Tankard": "Tankard_(band)",
+  "The Sisters of Mercy": "The_Sisters_of_Mercy",
   "Turbobier": "Turbobier"
 };
 
-async function fetchWikiImage(title, lang = "en") {
-  const url = `https://${lang}.wikipedia.org/w/api.php?` +
-    new URLSearchParams({
-      action: "query",
-      titles: title,
-      prop: "pageimages",
-      pithumbsize: "800",
-      format: "json",
-      origin: "*",
-      redirects: "1"
+async function fetchWikiRestImage(title, lang = "en") {
+  try {
+    const encoded = encodeURIComponent(title);
+    const url = `https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encoded}`;
+    const res = await fetch(url, { referrerPolicy: "no-referrer" });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.thumbnail?.source || data.originalimage?.source || null;
+  } catch (err) {
+    return null;
+  }
+}
+
+// NEU: Lädt ein hochwertiges 600x600 Album-Cover, falls die Band keine Wikipedia-Seite hat!
+async function fetchItunesCover(bandName) {
+  try {
+    const cleanBand = bandName.toLowerCase().normalize("NFKD").replace(/[^\w\s]/g, "").trim();
+    const url = `https://itunes.apple.com/search?term=${encodeURIComponent(bandName)}&entity=song&limit=10&country=DE`;
+    const res = await fetch(url, { signal: AbortSignal.timeout(3000) });
+    const data = await res.json();
+    
+    const match = data.results.find(t => {
+      const tArt = t.artistName.toLowerCase().normalize("NFKD").replace(/[^\w\s]/g, "").trim();
+      return tArt.includes(cleanBand) || cleanBand.includes(tArt);
     });
 
-  const res = await fetch(url);
-  if (!res.ok) return null;
-  const data = await res.json();
-  const pageObj = Object.values(data.query?.pages || {})[0];
-  return pageObj?.thumbnail?.source || null;
+    if (match && match.artworkUrl100) {
+      return match.artworkUrl100.replace("100x100bb", "600x600bb"); // Wandle iTunes Thumbnail in HD Cover um
+    }
+  } catch (e) {}
+  return null;
 }
 
 async function getBandPhoto(band) {
   if (band.name === "All for Metal") return "assets/all-for-metal-art.webp";
   if (photoCache.has(band.id)) return photoCache.get(band.id);
 
-  const title = WIKI_TITLES[band.name] || band.name;
-  let img = await fetchWikiImage(title, "en").catch(() => null);
+  const title = WIKI_TITLES[band.name] || band.name.replace(/ /g, "_");
 
+  // 1. Englische Wikipedia
+  let img = await fetchWikiRestImage(title, "en");
+
+  // 2. Deutsche Wikipedia
   if (!img) {
-    img = await fetchWikiImage(band.name, "de").catch(() => null);
+    const deTitle = band.name.replace(/ /g, "_");
+    img = await fetchWikiRestImage(deTitle, "de");
   }
 
-  if (!img && title.includes("(")) {
-    const cleanTitle = title.replace(/\s*\(.*?\)\s*/g, "");
-    img = await fetchWikiImage(cleanTitle, "en").catch(() => null);
+  // 3. Fallback Action API
+  if (!img) {
+    try {
+      const actionUrl = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(title)}&prop=pageimages&pithumbsize=800&format=json&origin=*&redirects=1`;
+      const res = await fetch(actionUrl);
+      if (res.ok) {
+        const data = await res.json();
+        const page = Object.values(data.query?.pages || {})[0];
+        img = page?.thumbnail?.source || null;
+      }
+    } catch (e) {}
+  }
+
+  // 4. RETTUNGSSCHIRM: iTunes Album-Cover laden (Für Håndgemeng, Igel vs. Shark, Katerfahrt etc.)
+  if (!img) {
+    img = await fetchItunesCover(band.name);
   }
 
   photoCache.set(band.id, img);
@@ -121,13 +152,17 @@ function loadCardPhotos() {
     if (!band) return;
 
     getBandPhoto(band).then(src => {
-      imgEl.src = src || "assets/all-for-metal-art.webp";
+      if (src) {
+        imgEl.src = src;
+      } else {
+        imgEl.src = "assets/all-for-metal-art.webp";
+      }
     });
   });
 }
 
 /* ---------------------------------------------------------
-   AUDIO ENGINE (Apple Music / iTunes API)
+   AUDIO ENGINE (Tiefenscanner über 4 Länder)
    --------------------------------------------------------- */
 const cleanStr = val =>
   String(val || "")
@@ -137,11 +172,11 @@ const cleanStr = val =>
     .replace(/[åäæ]/g, "a")
     .replace(/[øö]/g, "o")
     .replace(/[ü]/g, "u")
-    .replace(/&/g, " and ")
+    .replace(/['’]/g, "") // Apostrophe restlos löschen
     .replace(/[^a-z0-9]+/g, " ")
     .trim();
 
-function matchExactTrack(track, band, song) {
+function isSongMatch(track, band, song) {
   if (!track?.previewUrl?.startsWith("https://")) return false;
   
   const aWanted = cleanStr(band.name).replace(/^the /, "");
@@ -152,61 +187,41 @@ function matchExactTrack(track, band, song) {
     .replace(/\s*(explicit|remaster(ed)?|radio edit|single version|album version|version|live)\s*/g, " ")
     .trim();
 
+  // Sehr fehlertoleranter Abgleich für Indie-Bands
   const artistMatch = aTrack.includes(aWanted) || aWanted.includes(aTrack);
   const songMatch = sTrack.includes(sWanted) || sWanted.includes(sTrack);
 
   return artistMatch && songMatch;
 }
 
-async function queryItunes(params) {
-  const url = "https://itunes.apple.com/search?" + new URLSearchParams(params);
-  const res = await fetch(url, { signal: AbortSignal.timeout(4500) });
-  if (!res.ok) return [];
-  const data = await res.json();
-  return data.results || [];
-}
-
 async function findStudioAudio(band, song) {
   const cacheKey = band.name + "|" + song.title;
   if (previewCache.has(cacheKey)) return previewCache.get(cacheKey);
 
-  const cleanBandName = band.name
-    .replace(/å/g, "a").replace(/Å/g, "A")
-    .replace(/ø/g, "o").replace(/Ø/g, "O");
+  const cleanBandName = band.name.replace(/å/g, "a").replace(/Å/g, "A").replace(/ø/g, "o").replace(/Ø/g, "O");
 
-  for (const country of ["DE", "US"]) {
-    try {
-      const results = await queryItunes({
-        term: `${cleanBandName} ${song.title}`,
-        entity: "song",
-        limit: "25",
-        country,
-        media: "music"
-      });
+  // Multi-Country Loop um Geo-Blocks zu umgehen
+  const searchTerms = [`${cleanBandName} ${song.title}`, cleanBandName];
+  const countries = ["DE", "US", "AT", "CH"];
 
-      const match = results.find(t => matchExactTrack(t, band, song));
-      if (match?.previewUrl) {
-        previewCache.set(cacheKey, match);
-        return match;
-      }
-    } catch (e) {}
-  }
-
-  try {
-    const artistResults = await queryItunes({
-      term: cleanBandName,
-      entity: "song",
-      limit: "50",
-      country: "DE",
-      media: "music"
-    });
-
-    const match2 = artistResults.find(t => matchExactTrack(t, band, song));
-    if (match2?.previewUrl) {
-      previewCache.set(cacheKey, match2);
-      return match2;
+  for (const term of searchTerms) {
+    for (const country of countries) {
+      try {
+        const url = `https://itunes.apple.com/search?term=${encodeURIComponent(term)}&entity=song&limit=50&country=${country}`;
+        const res = await fetch(url, { signal: AbortSignal.timeout(3500) });
+        if (!res.ok) continue;
+        const data = await res.json();
+        
+        // Geht alle 50 Ergebnisse durch, um auch versteckte Indie-Treffer zu fischen
+        for (const track of data.results) {
+          if (isSongMatch(track, band, song)) {
+            previewCache.set(cacheKey, track);
+            return track;
+          }
+        }
+      } catch (e) {}
     }
-  } catch (e) {}
+  }
 
   previewCache.set(cacheKey, null);
   return null;
@@ -324,7 +339,7 @@ function cardHTML(band) {
   return `
     <article class="concept-card ${isSelected ? 'active-selected' : ''}" data-band-id="${band.id}">
       <div class="concept-card-img-wrap">
-        <img data-img-band-id="${band.id}" src="assets/all-for-metal-art.webp" alt="${band.name}" loading="lazy">
+        <img data-img-band-id="${band.id}" src="assets/all-for-metal-art.webp" alt="${band.name}" loading="lazy" referrerpolicy="no-referrer">
       </div>
       <div class="concept-card-body">
         <h3 class="concept-card-name">${band.name}</h3>
@@ -341,12 +356,9 @@ function cardHTML(band) {
 
 function render() {
   const query = $("search").value.trim().toLowerCase();
-
   const isFilterActive = Boolean(selectedDay || query);
   const resetBtn = $("reset-view-btn");
-  if (resetBtn) {
-    resetBtn.classList.toggle("hidden", !isFilterActive);
-  }
+  if (resetBtn) resetBtn.classList.toggle("hidden", !isFilterActive);
 
   const baseFilter = band => {
     const matchQuery = band.name.toLowerCase().includes(query);
@@ -355,17 +367,9 @@ function render() {
   };
 
   const lineupBands = BANDS.filter(baseFilter);
+  const favoriteBands = BANDS.filter(b => (status(b.id) === "must" || status(b.id) === "maybe") && baseFilter(b));
+  const unratedBands = BANDS.filter(b => status(b.id) === "new" && baseFilter(b));
 
-  const favoriteBands = BANDS.filter(b => {
-    const s = status(b.id);
-    return (s === "must" || s === "maybe") && baseFilter(b);
-  });
-
-  const unratedBands = BANDS.filter(b => {
-    return status(b.id) === "new" && baseFilter(b);
-  });
-
-  // 1. Line-Up
   if ($("band-grid")) {
     if (selectedDay && lineupBands.length === 0) {
       $("band-grid").innerHTML = `
@@ -383,14 +387,12 @@ function render() {
     }
   }
 
-  // 2. Meine Bands
   if ($("mine-grid")) {
     $("mine-grid").innerHTML = favoriteBands.length
       ? favoriteBands.map(cardHTML).join("")
       : '<div style="grid-column: 1/-1; padding: 40px 10px; color: var(--rh-muted); text-align: center; line-height: 1.6;">Du hast noch keine Bands mit <strong>★ (Ja)</strong> oder <strong>◉ (Vielleicht)</strong> markiert.</div>';
   }
 
-  // 3. Noch Offen
   if ($("unrated-grid")) {
     $("unrated-grid").innerHTML = unratedBands.length
       ? unratedBands.map(cardHTML).join("")
@@ -399,7 +401,6 @@ function render() {
 
   loadCardPhotos();
 
-  // Badges
   const favCount = BANDS.filter(b => status(b.id) === "must" || status(b.id) === "maybe").length;
   const unratedCount = BANDS.filter(b => status(b.id) === "new").length;
   if ($("nav-count-favorites")) $("nav-count-favorites").textContent = favCount;
@@ -422,11 +423,11 @@ function resetToAllBands() {
 
 function closeDrawer() {
   stopCurrentAudio();
-  $("detail-drawer").classList.add("hidden");
-  const backdrop = $("drawer-backdrop");
-  if (backdrop) backdrop.classList.add("hidden");
-  activeBand = null;
-  render();
+  if (window.innerWidth <= 900) {
+    $("detail-drawer").classList.add("hidden");
+    const backdrop = $("drawer-backdrop");
+    if (backdrop) backdrop.classList.add("hidden");
+  }
 }
 
 function openBand(band) {
@@ -439,13 +440,16 @@ function openBand(band) {
   $("detail-website").href = band.website;
   $("detail-desc").textContent = band.description;
   
-  // Drawer & Mobile Backdrop öffnen
   $("detail-drawer").classList.remove("hidden");
-  const backdrop = $("drawer-backdrop");
-  if (backdrop) backdrop.classList.remove("hidden");
+  if (window.innerWidth <= 900) {
+    const backdrop = $("drawer-backdrop");
+    if (backdrop) backdrop.classList.remove("hidden");
+  }
 
+  const detailImg = $("detail-img");
+  detailImg.referrerPolicy = "no-referrer";
   getBandPhoto(band).then(src => {
-    $("detail-img").src = src || "assets/all-for-metal-art.webp";
+    detailImg.src = src || "assets/all-for-metal-art.webp";
   });
 
   const currentStatus = status(band.id);
@@ -490,9 +494,13 @@ function navigate(targetPage) {
    EVENTS & DELEGATION
    --------------------------------------------------------- */
 document.addEventListener("click", e => {
-  // 1. Rating-Buttons
+  
+  // 1. Rating-Buttons (Audio läuft nahtlos weiter!)
   const rateBtn = e.target.closest("[data-rate]");
   if (rateBtn) {
+    e.stopPropagation();
+    e.preventDefault();
+    
     const id = rateBtn.dataset.id;
     const clickedVal = rateBtn.dataset.rate;
 
@@ -504,14 +512,30 @@ document.addEventListener("click", e => {
 
     persist();
     render();
-    if (activeBand?.id === id) openBand(activeBand);
+
+    if (activeBand && activeBand.id === id) {
+      const currentStatus = status(id);
+      $("detail-rating-btns").innerHTML = `
+        <button data-rate="must" data-id="${id}" class="${currentStatus === 'must' ? 'active' : ''}">★ Ja</button>
+        <button data-rate="maybe" data-id="${id}" class="${currentStatus === 'maybe' ? 'active' : ''}">◉ Vielleicht</button>
+        <button data-rate="skip" data-id="${id}" class="${currentStatus === 'skip' ? 'active' : ''}">✕ Nein</button>
+      `;
+    }
     return;
   }
 
-  // 2. Band-Auswahl
+  // 2. Band-Auswahl über Karte
   const card = e.target.closest(".concept-card");
   if (card) {
     const bandId = card.dataset.bandId;
+    if (activeBand && activeBand.id === bandId) {
+      $("detail-drawer").classList.remove("hidden");
+      if (window.innerWidth <= 900) {
+        const backdrop = $("drawer-backdrop");
+        if (backdrop) backdrop.classList.remove("hidden");
+      }
+      return; 
+    }
     const band = BANDS.find(b => b.id === bandId);
     if (band) openBand(band);
     return;
@@ -525,7 +549,7 @@ document.addEventListener("click", e => {
     return;
   }
 
-  // 4. Logo / Brand Reset
+  // 4. Logo Reset
   if (e.target.closest("#brand-reset")) {
     resetToAllBands();
     return;
@@ -565,7 +589,6 @@ if (resetViewBtn) {
   resetViewBtn.onclick = resetToAllBands;
 }
 
-// Schließen des Drawers (Button & Klick auf Backdrop)
 $("drawer-close-btn").onclick = closeDrawer;
 const backdrop = $("drawer-backdrop");
 if (backdrop) backdrop.onclick = closeDrawer;
@@ -578,7 +601,6 @@ $("desc-expand-btn").onclick = () => {
 
 $("search").addEventListener("input", render);
 
-// Export / Import
 $("export").onclick = () => {
   const blob = new Blob([JSON.stringify(ratings, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
@@ -608,8 +630,14 @@ $("import-file").onchange = async event => {
   event.target.value = "";
 };
 
-// Start
 render();
 if (BANDS.length > 0) {
-  openBand(BANDS.find(b => b.id === "accept") || BANDS[0]);
+  openBand(BANDS[0]);
+  if (window.innerWidth <= 900) {
+    $("detail-drawer").classList.add("hidden");
+  }
 }
+
+window.addEventListener("load", () => {
+  window.scrollTo(0, 0);
+});

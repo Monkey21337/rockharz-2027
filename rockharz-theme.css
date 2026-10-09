@@ -1,108 +1,82 @@
 /* =========================================================
-   ROCKHARZ OFFICIAL DESIGN 2027
-   - Farbschema der Website: Dark Forest Night (#030e09 / #061611)
-   - Akzente: Bernstein-Gold (#e5ba55 / #f3cb65) & Moosgrün
-   - Mobile: 100% passgenaue Navigation ohne horizontales Scrollen
+   ROCKHARZ 2027 — EMBER & FORGE (DEFINITIVE STYLESHEET)
    ========================================================= */
 
 :root {
-  /* Rockharz Website Originalfarben */
-  --rh-bg: #030e09;
-  --rh-bg-gradient: radial-gradient(ellipse at 50% 0%, #082118 0%, #030e09 70%);
-  --rh-panel: #091713;
-  --rh-panel-dark: #050f0c;
-  --rh-border: #1a382d;
-  --rh-border-light: #2c5949;
+  --rh-bg: #090707;
+  --rh-panel: #140f0e;
+  --rh-border: #38211a;
+  --rh-border-light: #543328;
   
-  /* Gold- & Highlight-Töne */
-  --rh-gold: #e5ba55;
-  --rh-gold-bright: #f5d175;
-  --rh-gold-glow: rgba(229, 186, 85, 0.35);
+  --rh-orange: #e65a28;
+  --rh-orange-bright: #f4793b;
+  --rh-orange-glow: rgba(230, 90, 40, 0.4);
   
-  /* Text & Muted */
-  --rh-text: #e7eedd;
-  --rh-muted: #8d9e96;
+  --rh-text: #eedfd0;
+  --rh-muted: #9e8a80;
   
-  /* Status */
-  --rh-rate-active: #8b2518;
-  --rh-rate-border: #e5ba55;
+  --rh-rate-active: #661f14;
+  --rh-rate-border: #e65a28;
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
-  background: var(--rh-bg-gradient), var(--rh-bg);
+  background: radial-gradient(ellipse at 50% -10%, #2b110b 0%, #0c0808 55%, #070505 100%), var(--rh-bg);
   background-attachment: fixed;
   color: var(--rh-text);
   font-family: 'Inter', Arial, sans-serif;
   margin: 0;
   padding: 0;
-  -webkit-tap-highlight-color: transparent;
+  min-height: 100vh;
 }
 
-/* Banner */
-html body header.hero {
-  aspect-ratio: 2048 / 379 !important;
-  background: #030e09 url("assets/festival-banner.webp") center / 100% 100% no-repeat !important;
-  border-bottom: 2px solid #1a382d;
+.hidden {
+  display: none !important;
+}
+
+/* 1. HERO BANNER */
+header.hero {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2048 / 379;
+  margin: 0;
+  padding: 0;
+  background: #090707 url("assets/festival-banner.webp") center / cover no-repeat;
+  border-bottom: 3px solid #4a1d13;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.95);
 }
 
 @media (max-width: 768px) {
-  html body header.hero {
-    aspect-ratio: 1564 / 739 !important;
-    background-image: url("assets/festival-banner-mobile.webp") !important;
-    background-size: cover !important;
-    background-position: center center !important;
+  header.hero {
+    aspect-ratio: 1564 / 739;
+    background-image: url("assets/festival-banner-mobile.webp");
   }
 }
 
-/* Navigation */
+/* 2. NAVIGATION */
 .topnav {
   position: sticky;
   top: 0;
   z-index: 50;
-  display: flex;
-  flex-direction: column;
-  background: linear-gradient(180deg, #0b1c16, #05100c);
+  background: linear-gradient(180deg, #1b110e, #0c0807);
   border-bottom: 2px solid var(--rh-border);
-  box-shadow: 0 4px 18px rgba(0,0,0,0.85);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.85);
+  margin: 0;
+  padding: 0;
 }
 
-.topnav-top-row {
+.topnav-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 16px;
-  width: 100%;
-}
-
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 0 16px 8px;
-}
-
-.nav-links button {
-  background: transparent;
-  border: 1px solid transparent;
-  color: #c0cfc8;
-  padding: 8px 14px;
-  font-family: "Barlow Condensed", sans-serif;
-  font-size: 15px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.nav-links button:hover,
-.nav-links button.active {
-  background: #0d271f;
-  border-color: var(--rh-gold);
-  color: var(--rh-gold-bright);
-  box-shadow: 0 0 10px var(--rh-gold-glow);
+  max-width: 1720px;
+  margin: 0 auto;
+  padding: 0 16px;
+  min-height: 56px;
+  gap: 12px;
 }
 
 .nav-brand {
@@ -113,19 +87,12 @@ html body header.hero {
   font-weight: 900;
   font-size: 26px;
   letter-spacing: 1px;
-}
-
-button.nav-brand {
   background: transparent;
   border: 0;
   cursor: pointer;
-  padding: 0;
   color: inherit;
-  transition: transform 0.15s ease;
-}
-
-button.nav-brand:hover {
-  transform: scale(1.03);
+  padding: 0;
+  flex-shrink: 0;
 }
 
 .brand-icon-stag {
@@ -133,10 +100,41 @@ button.nav-brand:hover {
   width: 26px;
   height: 30px;
   background: transparent url("assets/stag-skull-clean.png") center / contain no-repeat;
-  filter: drop-shadow(0 0 6px var(--rh-gold));
+  filter: drop-shadow(0 0 7px var(--rh-orange));
 }
 
-.gold { color: var(--rh-gold); }
+.orange { color: var(--rh-orange); }
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1 1 auto;
+  margin-left: 12px;
+}
+
+.nav-links button {
+  background: transparent;
+  border: 1px solid transparent;
+  color: #cbbab0;
+  padding: 8px 14px;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.nav-links button:hover,
+.nav-links button.active {
+  background: #2b130c;
+  border-color: var(--rh-orange);
+  color: #fff;
+  box-shadow: 0 0 12px var(--rh-orange-glow);
+}
 
 .nav-badge {
   display: inline-block;
@@ -144,18 +142,19 @@ button.nav-brand:hover {
   padding: 1px 6px;
   font-size: 11px;
   border-radius: 10px;
-  background: #081a14;
+  background: #180d09;
   border: 1px solid var(--rh-border);
-  color: var(--rh-gold);
+  color: var(--rh-orange-bright);
 }
 
 .nav-tools {
   display: flex;
   gap: 6px;
+  flex-shrink: 0;
 }
 
 .nav-tools button {
-  background: #091a14;
+  background: #140d0a;
   border: 1px solid var(--rh-border);
   color: var(--rh-text);
   padding: 6px 12px;
@@ -167,33 +166,22 @@ button.nav-brand:hover {
 }
 
 .nav-tools button:hover {
-  border-color: var(--rh-gold);
-  color: var(--rh-gold);
+  border-color: var(--rh-orange);
+  color: var(--rh-orange-bright);
 }
 
-/* 2-Spalten Layout Desktop */
-.layout-two-col {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 410px;
-  gap: 20px;
-  max-width: 1720px;
-  margin: 16px auto;
-  padding: 0 16px;
-  align-items: start;
-}
-
-/* Festivaltage */
+/* 3. FESTIVALTAGE */
 .festival-days {
-  padding: 10px 16px;
-  background: #04100b;
-  border-bottom: 1px solid #142a22;
+  padding: 12px 16px;
+  background: #090606;
+  border-bottom: 1px solid #291712;
 }
 
 .festival-days-inner {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 12px;
-  max-width: 1680px;
+  max-width: 1720px;
   margin: auto;
 }
 
@@ -203,8 +191,8 @@ button.festival-day {
   align-items: center;
   gap: 12px;
   padding: 10px 14px;
-  background: linear-gradient(135deg, rgba(255,255,255,0.02), #091713 70%);
-  border: 1px solid #19382e;
+  background: linear-gradient(135deg, rgba(255,255,255,0.02), #140e0c 70%);
+  border: 1px solid #2e1a14;
   border-radius: 4px;
   cursor: pointer;
   text-align: left;
@@ -218,89 +206,125 @@ button.festival-day:hover {
 }
 
 button.festival-day.active-day {
-  background: linear-gradient(135deg, color-mix(in srgb, var(--day-color) 25%, #081d16), #06110d);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--day-color) 25%, #180f0c), #0a0706);
   border-color: var(--day-color);
   box-shadow: 0 0 16px color-mix(in srgb, var(--day-color) 40%, transparent);
 }
 
-.festival-day-wednesday { --day-color: #d95328; }
+.festival-day-wednesday { --day-color: #e65a28; }
 .festival-day-thursday { --day-color: #38b4f2; }
 .festival-day-friday { --day-color: #5ecf56; }
 .festival-day-saturday { --day-color: #b56ff0; }
 
 .festival-day .day-symbol {
-  width: 40px;
-  height: 44px;
-  flex-shrink: 0;
-  background: transparent url("assets/stag-skull-clean.png") center/contain no-repeat;
-  filter: drop-shadow(0 0 5px var(--day-color));
+  display: block;
+  width: 42px;
+  height: 46px;
+  flex: 0 0 42px;
+  background: transparent url("assets/stag-skull-clean.png") center / contain no-repeat;
+  filter: drop-shadow(0 0 6px var(--day-color));
 }
 
 .festival-day strong {
+  display: block;
   color: var(--day-color);
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 19px;
+  font-size: 20px;
   letter-spacing: 0.5px;
 }
 
 .festival-day small {
-  font-size: 10px;
-  color: #a4b5ad;
   display: block;
+  font-size: 10px;
+  color: #b49f94;
   margin-top: 2px;
 }
 
-/* Heading & Toolbar */
+/* =========================================================
+   4. DAS ZWEISPALTIGE HAUPTLAYOUT (DESKTOP)
+   ========================================================= */
+.rh-layout-wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  max-width: 1720px;
+  margin: 16px auto;
+  padding: 0 16px;
+  width: 100%;
+}
+
+.rh-main-content {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: auto;
+}
+
+/* RECHTE SPALTE: DETAIL-PANEL & PLAYER */
+aside.band-detail-drawer {
+  flex: 0 0 420px;
+  width: 420px;
+  position: sticky;
+  top: 76px;
+  background: #110c0b;
+  border: 1px solid var(--rh-border);
+  border-radius: 6px;
+  box-shadow: 0 10px 35px rgba(0,0,0,0.9);
+  z-index: 40;
+  max-height: calc(100vh - 92px);
+  overflow-y: auto;
+}
+
+.drawer-backdrop { display: none; }
+.drawer-handle { display: none; }
+
+/* 5. HEADING & TOOLBAR */
 .heading-row {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
+  gap: 16px;
   border-bottom: 1px solid var(--rh-border);
   padding-bottom: 12px;
   margin-bottom: 16px;
+  width: 100%;
+}
+
+.heading-text {
+  min-width: 0;
+  flex: 1 1 auto;
 }
 
 .heading-row h2 {
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 34px;
+  font-size: 38px;
   margin: 0;
+  line-height: 1;
   letter-spacing: 1px;
   color: #fff;
+  white-space: nowrap;
 }
 
-.heading-row h2 em { color: var(--rh-gold); font-style: normal; }
-.heading-row p { margin: 4px 0 0; font-size: 12px; color: var(--rh-muted); letter-spacing: 0.5px; }
+.heading-row h2 em { color: var(--rh-orange); font-style: normal; }
+.heading-row p { margin: 6px 0 0; font-size: 12px; color: var(--rh-muted); letter-spacing: 0.5px; }
 
 .toolbar-inline {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex: 0 0 auto;
 }
-
-.day-reset-btn {
-  background: #10261f;
-  border: 1px solid var(--rh-gold);
-  color: var(--rh-gold-bright);
-  border-radius: 4px;
-  padding: 0 12px;
-  height: 36px;
-  font-size: 11px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.day-reset-btn:hover { background: #183d31; }
 
 .toolbar-inline .search {
-  background: #06140f;
+  background: #110c0a;
   border: 1px solid var(--rh-border);
   border-radius: 4px;
   color: #fff;
-  height: 36px;
+  height: 38px;
   display: flex;
   align-items: center;
-  padding: 0 10px;
-  gap: 6px;
+  padding: 0 12px;
+  gap: 8px;
+  width: 240px;
 }
 
 .toolbar-inline .search input {
@@ -309,38 +333,54 @@ button.festival-day.active-day {
   color: #fff;
   outline: none;
   font-size: 13px;
+  width: 100%;
 }
 
-/* Band-Grid */
+.day-reset-btn {
+  background: #24110a;
+  border: 1px solid var(--rh-orange);
+  color: var(--rh-orange-bright);
+  border-radius: 4px;
+  padding: 0 12px;
+  height: 38px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* 6. BAND-GRID */
 .band-grid-concept {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
   gap: 16px;
+  width: 100%;
 }
 
-/* Bandkarte */
 .concept-card {
   position: relative;
-  background: var(--rh-panel);
+  background: linear-gradient(160deg, #171110 0%, #0d0908 100%);
   border: 1px solid var(--rh-border);
   border-radius: 5px;
   overflow: hidden;
   cursor: pointer;
   user-select: none;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.6);
   transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
 }
 
 .concept-card:hover, .concept-card.active-selected {
-  border-color: var(--rh-gold);
+  border-color: var(--rh-orange);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.7), 0 0 10px var(--rh-gold-glow);
+  box-shadow: 0 6px 22px rgba(0,0,0,0.8), 0 0 12px var(--rh-orange-glow);
 }
 
 .concept-card-img-wrap {
   position: relative;
   height: 160px;
-  background: radial-gradient(circle at 50% 35%, #0e271f, #05120d 75%);
+  background: radial-gradient(circle at 50% 30%, #301710 0%, #0c0807 80%);
   overflow: hidden;
+  border-bottom: 1px solid #2d1812;
 }
 
 .concept-card-img-wrap img {
@@ -364,10 +404,11 @@ button.festival-day.active-day {
   text-transform: uppercase;
   margin: 0;
   color: var(--rh-text);
+  letter-spacing: 0.5px;
 }
 
 .concept-card:hover .concept-card-name {
-  color: var(--rh-gold-bright);
+  color: var(--rh-orange-bright);
 }
 
 .concept-card-genre {
@@ -376,21 +417,20 @@ button.festival-day.active-day {
   margin-top: 2px;
 }
 
-/* Rating-Buttons */
 .concept-card-ratings {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 6px;
   margin-top: 10px;
   padding-top: 8px;
-  border-top: 1px solid #11281f;
+  border-top: 1px solid #24140f;
 }
 
 .concept-card-ratings button {
-  background: #0b1f18;
-  border: 1px solid #1a3c30;
+  background: #140d0b;
+  border: 1px solid #2d1812;
   border-radius: 3px;
-  color: #b2c4bc;
+  color: #bfaea5;
   padding: 8px 0;
   font-size: 15px;
   cursor: pointer;
@@ -398,30 +438,18 @@ button.festival-day.active-day {
 }
 
 .concept-card-ratings button:hover {
-  background: #14362a;
-  border-color: var(--rh-gold);
+  background: #24120c;
+  border-color: var(--rh-orange);
 }
 
 .concept-card-ratings button.active {
   background: var(--rh-rate-active);
   border-color: var(--rh-rate-border);
   color: #fff;
-  box-shadow: 0 0 8px rgba(229, 186, 85, 0.4);
+  box-shadow: 0 0 10px var(--rh-orange-glow);
 }
 
-/* Detail Drawer (Desktop) */
-.band-detail-drawer {
-  position: sticky;
-  top: 100px;
-  background: #081712;
-  border: 1px solid var(--rh-border);
-  border-radius: 6px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.85);
-  z-index: 40;
-}
-
-.drawer-handle { display: none; }
-
+/* 7. DRAWER-INHALT & AUDIO-PLAYER */
 .drawer-close {
   position: absolute;
   top: 10px;
@@ -439,8 +467,9 @@ button.festival-day.active-day {
 .drawer-header-art {
   position: relative;
   height: 180px;
-  background: #0c2019;
+  background: #1b0f0b;
   overflow: hidden;
+  border-bottom: 2px solid #3d1c13;
 }
 
 .drawer-header-art img {
@@ -476,20 +505,20 @@ button.festival-day.active-day {
 
 .drawer-website-btn {
   font-size: 11px;
-  color: var(--rh-gold);
+  color: var(--rh-orange);
   text-decoration: none;
   border: 1px solid var(--rh-border);
   padding: 4px 8px;
   border-radius: 3px;
-  background: #0c221a;
+  background: #190e0b;
   transition: all 0.15s;
 }
-.drawer-website-btn:hover { border-color: var(--rh-gold); color: #fff; }
+.drawer-website-btn:hover { border-color: var(--rh-orange); color: #fff; }
 
 .drawer-desc-block p {
   font-size: 12px;
   line-height: 1.5;
-  color: #c7d6ce;
+  color: #d1c1b7;
   margin: 0;
 }
 
@@ -503,7 +532,7 @@ button.festival-day.active-day {
 .desc-expand-link {
   background: transparent;
   border: 0;
-  color: var(--rh-gold);
+  color: var(--rh-orange);
   font-size: 11px;
   padding: 4px 0 0;
   cursor: pointer;
@@ -514,7 +543,7 @@ button.festival-day.active-day {
   font-size: 15px;
   font-weight: 800;
   letter-spacing: 1px;
-  color: var(--rh-gold);
+  color: var(--rh-orange);
   margin: 14px 0 8px;
   display: flex;
   justify-content: space-between;
@@ -527,9 +556,9 @@ button.festival-day.active-day {
 }
 
 .drawer-ratings-block button {
-  background: #0c2019;
+  background: #140d0a;
   border: 1px solid var(--rh-border);
-  color: #c6d6ce;
+  color: #d4c5bb;
   padding: 8px 4px;
   font-size: 12px;
   border-radius: 3px;
@@ -538,7 +567,7 @@ button.festival-day.active-day {
 
 .drawer-ratings-block button.active {
   background: var(--rh-rate-active);
-  border-color: var(--rh-gold);
+  border-color: var(--rh-orange);
   color: #fff;
 }
 
@@ -550,27 +579,53 @@ button.festival-day.active-day {
   grid-template-columns: 34px 28px 1fr auto 36px;
   align-items: center;
   gap: 8px;
-  background: #0b1a14;
+  background: #130d0b;
   border: 1px solid var(--rh-border);
   border-radius: 4px;
   padding: 6px 8px;
 }
 
 .drawer-song-row.playing {
-  border-color: var(--rh-gold);
-  background: #112d22;
+  border-color: var(--rh-orange);
+  background: #23120c;
 }
 
+/* =========================================================
+   DER EVIL EYE GLOW EFFEKT FÜR DEN SCHÄDEL 💀
+   ========================================================= */
 .song-skull-icon {
+  position: relative;
   width: 28px;
   height: 32px;
-  background: transparent url("assets/stag-skull-clean.png") center/contain no-repeat;
+  background: transparent url("assets/stag-skull-clean.png") center / contain no-repeat;
+  z-index: 1;
 }
 
+/* Pulsierende glühend-rote Augen via CSS-Gradient */
+.drawer-song-row.playing .song-skull-icon::after {
+  content: "";
+  position: absolute;
+  top: 30%; left: 15%; right: 15%; height: 25%;
+  background: radial-gradient(circle at 25% 50%, #ff1100 0%, transparent 40%),
+              radial-gradient(circle at 75% 50%, #ff1100 0%, transparent 40%);
+  filter: drop-shadow(0 0 3px #ff0000);
+  mix-blend-mode: screen; /* Lässt das Rot brillant durch den weißen Schädel scheinen */
+  z-index: 2;
+  animation: evil-eye 0.8s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes evil-eye {
+  0% { opacity: 0.5; filter: drop-shadow(0 0 2px #ff1100) brightness(1); transform: scale(0.95); }
+  100% { opacity: 1; filter: drop-shadow(0 0 8px #ff0000) brightness(1.6); transform: scale(1.05); }
+}
+
+/* --------------------------------------------------------- */
+
 .song-play-btn {
-  background: #14352a;
+  background: #24130c;
   border: 1px solid var(--rh-border);
-  color: var(--rh-gold);
+  color: var(--rh-orange-bright);
   width: 28px;
   height: 28px;
   border-radius: 50%;
@@ -582,14 +637,14 @@ button.festival-day.active-day {
 
 .drawer-song-row[aria-busy="true"] .song-play-btn {
   animation: rh-pulse 0.8s infinite alternate;
-  color: var(--rh-gold);
+  color: var(--rh-orange);
 }
 
 @keyframes rh-pulse { from { opacity: 0.3; } to { opacity: 1; } }
 
 .song-titles strong { display: block; font-size: 12px; color: #fff; }
 .song-titles small { font-size: 10px; color: var(--rh-muted); }
-.song-duration { font-size: 11px; color: #7f948b; }
+.song-duration { font-size: 11px; color: #8a766c; }
 
 .song-waveform {
   display: none;
@@ -603,7 +658,7 @@ button.festival-day.active-day {
 .song-waveform span {
   width: 2px;
   height: 100%;
-  background: var(--rh-gold-bright);
+  background: var(--rh-orange-bright);
   animation: rh-bar 0.8s ease-in-out infinite alternate;
 }
 .song-waveform span:nth-child(2) { animation-delay: 0.2s; height: 60%; }
@@ -611,124 +666,111 @@ button.festival-day.active-day {
 .song-waveform span:nth-child(4) { animation-delay: 0.1s; height: 40%; }
 @keyframes rh-bar { 0% { transform: scaleY(0.3); } 100% { transform: scaleY(1); } }
 
+.schedule {
+  padding: 24px;
+  background: #110c0b;
+  border: 1px solid var(--rh-border);
+  border-radius: 6px;
+  color: var(--rh-muted);
+}
+
 /* =========================================================
-   DEDIZIERTE MOBILE APP-ANSICHT (UNTER 900PX)
+   8. MOBILE RESPONSIVENESS (<= 900PX)
    ========================================================= */
 @media (max-width: 900px) {
-  .layout-two-col {
+  .rh-layout-wrapper {
     display: block;
     padding: 0 12px;
     margin-top: 12px;
   }
 
-  /* Navigation: Kein horizontales Scrollen mehr! */
-  .topnav {
-    padding: 0;
+  .rh-main-content {
+    width: 100%;
   }
 
-  .topnav-top-row {
-    padding: 6px 12px;
+  .topnav-inner {
+    flex-wrap: wrap;
+    padding: 8px 12px;
+    gap: 8px;
   }
 
-  .nav-brand { font-size: 22px; }
-  .brand-icon-stag { width: 22px; height: 26px; }
-
-  /* 4er Rasterleiste: Teilt sich die 100% Breite perfekt auf */
   .nav-links {
+    order: 3;
+    width: 100%;
+    margin-left: 0;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 4px;
-    padding: 0 8px 8px;
-    width: 100%;
+    padding: 0;
   }
 
   .nav-links button {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
     padding: 6px 2px;
     font-size: 10px;
-    line-height: 1.1;
-    text-align: center;
-    border-radius: 4px;
-    min-height: 42px;
+    min-height: 40px;
   }
 
-  .nav-links button span {
-    font-size: 14px;
-    margin-bottom: 2px;
-  }
-
-  .nav-badge {
-    margin-left: 0;
-    margin-top: 2px;
-    font-size: 9px;
-    padding: 0 4px;
-  }
-
+  .nav-links button span { font-size: 14px; margin-bottom: 2px; }
+  .nav-badge { margin: 2px 0 0; font-size: 9px; }
   .nav-tools button span { display: none; }
-  .nav-tools button { padding: 5px 8px; font-size: 13px; }
 
-  /* Festivaltage: 2x2 Grid */
-  .festival-days { padding: 8px 10px; }
   .festival-days-inner {
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;
   }
-  button.festival-day {
-    padding: 8px 10px;
-    gap: 8px;
-  }
-  .festival-day .day-symbol { width: 32px; height: 36px; }
-  .festival-day strong { font-size: 16px; }
-  .festival-day small { font-size: 9px; }
 
-  /* Band-Grid: 2 Spalten */
+  button.festival-day { padding: 8px 10px; }
+  .festival-day .day-symbol { width: 32px; height: 36px; flex-basis: 32px; }
+  .festival-day strong { font-size: 16px; }
+
   .band-grid-concept {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 10px;
   }
-  .concept-card-img-wrap { height: 135px; }
-  .concept-card-name { font-size: 16px; line-height: 1.1; }
-  .concept-card-genre { font-size: 11px; }
-  .concept-card-ratings button { padding: 9px 0; font-size: 14px; }
 
-  /* Toolbar */
-  .heading-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .heading-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .heading-row h2 { font-size: 28px; }
   .toolbar-inline { width: 100%; }
-  .toolbar-inline .search { flex: 1; }
+  .toolbar-inline .search { width: 100%; }
 
-  /* DETAIL-DRAWER: Nativer Bottom-Sheet */
+  /* Mobile Bottom Sheet Drawer */
   .drawer-backdrop {
+    display: block;
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.82);
     backdrop-filter: blur(4px);
     z-index: 90;
     transition: opacity 0.25s ease;
   }
+  .drawer-backdrop.hidden { display: none; }
 
-  .band-detail-drawer {
+  aside.band-detail-drawer {
+    display: block;
     position: fixed;
     left: 0;
     right: 0;
     bottom: 0;
     top: auto;
+    width: 100%;
     max-height: 85vh;
     border-radius: 16px 16px 0 0;
-    border: 1px solid var(--rh-border);
-    border-bottom: 0;
-    background: #071510;
+    background: #0f0a09;
     z-index: 100;
     overflow-y: auto;
-    overscroll-behavior: contain;
-    box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.95);
     transform: translateY(0);
     transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .band-detail-drawer.hidden {
+  aside.band-detail-drawer.hidden {
     display: block !important;
     transform: translateY(105%);
     pointer-events: none;
@@ -738,24 +780,12 @@ button.festival-day.active-day {
     display: block;
     width: 42px;
     height: 4px;
-    background: #1e3f33;
+    background: #47261e;
     border-radius: 3px;
     margin: 8px auto 6px;
   }
-
-  .drawer-close {
-    top: 12px;
-    right: 12px;
-    width: 32px;
-    height: 32px;
-    font-size: 14px;
-  }
-
-  .drawer-header-art { height: 160px; }
-  .drawer-header-art h2 { font-size: 26px; }
 }
 
-@media (max-width: 400px) {
+@media (max-width: 420px) {
   .band-grid-concept { grid-template-columns: 1fr; }
-  .concept-card-img-wrap { height: 160px; }
 }

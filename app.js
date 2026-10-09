@@ -1,9 +1,10 @@
 "use strict";
 
 /* ROCKHARZ 2027 — DEFINITIVE ENGINE
-   - Ultimate Audio Engine: Tiefe Fallback-Suche über 4 Länder (DE, US, AT, CH)
-   - Bilder-Rettungsschirm: Lädt iTunes HD-Cover, wenn Band keine Wikipedia hat
-   - Nahtlose Audio-Wiedergabe beim Voten
+   - Exakter Song-Abgleich (Kein Ersetzen durch falsche Lieder mehr!)
+   - Multi-Level Fallback (iTunes 6 Länder + Deezer JSONP)
+   - Offline Line-Up PDF Export mit Farbmarkierungen
+   - Nahtlose Audio-Wiedergabe & Master-Volume Save
 */
 
 if ("scrollRestoration" in history) {
@@ -12,6 +13,7 @@ if ("scrollRestoration" in history) {
 window.scrollTo(0, 0);
 
 const KEY = "rockharz2027_favorites_v1";
+const VOL_KEY = "rockharz2027_volume";
 const $ = id => document.getElementById(id);
 
 let ratings = {};
@@ -21,6 +23,9 @@ let currentAudio = null;
 let currentSongIndex = -1;
 let playRequestId = 0;
 let selectedDay = null;
+
+let masterVolume = parseFloat(localStorage.getItem(VOL_KEY));
+if (isNaN(masterVolume)) masterVolume = 0.5;
 
 const photoCache = new Map();
 const previewCache = new Map();
@@ -88,12 +93,11 @@ async function fetchWikiRestImage(title, lang = "en") {
   }
 }
 
-// NEU: Lädt ein hochwertiges 600x600 Album-Cover, falls die Band keine Wikipedia-Seite hat!
 async function fetchItunesCover(bandName) {
   try {
     const cleanBand = bandName.toLowerCase().normalize("NFKD").replace(/[^\w\s]/g, "").trim();
-    const url = `https://itunes.apple.com/search?term=${encodeURIComponent(bandName)}&entity=song&limit=10&country=DE`;
-    const res = await fetch(url, { signal: AbortSignal.timeout(3000) });
+    const url = `https://itunes.apple.com/search?term=${encodeURIComponent(bandName)}&entity=song&limit=15&country=DE`;
+    const res = await fetch(url, { signal: AbortSignal.timeout(3500) });
     const data = await res.json();
     
     const match = data.results.find(t => {
@@ -102,28 +106,23 @@ async function fetchItunesCover(bandName) {
     });
 
     if (match && match.artworkUrl100) {
-      return match.artworkUrl100.replace("100x100bb", "600x600bb"); // Wandle iTunes Thumbnail in HD Cover um
+      return match.artworkUrl100.replace("100x100bb", "600x600bb"); 
     }
   } catch (e) {}
   return null;
 }
 
 async function getBandPhoto(band) {
-  if (band.name === "All for Metal") return "assets/all-for-metal-art.webp";
   if (photoCache.has(band.id)) return photoCache.get(band.id);
 
   const title = WIKI_TITLES[band.name] || band.name.replace(/ /g, "_");
-
-  // 1. Englische Wikipedia
   let img = await fetchWikiRestImage(title, "en");
-
-  // 2. Deutsche Wikipedia
+  
   if (!img) {
     const deTitle = band.name.replace(/ /g, "_");
     img = await fetchWikiRestImage(deTitle, "de");
   }
-
-  // 3. Fallback Action API
+  
   if (!img) {
     try {
       const actionUrl = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(title)}&prop=pageimages&pithumbsize=800&format=json&origin=*&redirects=1`;
@@ -136,7 +135,6 @@ async function getBandPhoto(band) {
     } catch (e) {}
   }
 
-  // 4. RETTUNGSSCHIRM: iTunes Album-Cover laden (Für Håndgemeng, Igel vs. Shark, Katerfahrt etc.)
   if (!img) {
     img = await fetchItunesCover(band.name);
   }
@@ -155,74 +153,124 @@ function loadCardPhotos() {
       if (src) {
         imgEl.src = src;
       } else {
-        imgEl.src = "assets/all-for-metal-art.webp";
+        imgEl.src = "assets/stag-skull-clean.png";
+        imgEl.style.objectFit = "contain";
+        imgEl.style.padding = "20px";
       }
     });
   });
 }
 
 /* ---------------------------------------------------------
-   AUDIO ENGINE (Tiefenscanner über 4 Länder)
+   AUDIO ENGINE (EXAKTER SONG-MATCHING MODUS)
    --------------------------------------------------------- */
 const cleanStr = val =>
   String(val || "")
     .toLowerCase()
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/ß/g, "ss")
     .replace(/[åäæ]/g, "a")
     .replace(/[øö]/g, "o")
     .replace(/[ü]/g, "u")
-    .replace(/['’]/g, "") // Apostrophe restlos löschen
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/['’´`]/g, "") 
     .replace(/[^a-z0-9]+/g, " ")
     .trim();
 
 function isSongMatch(track, band, song) {
-  if (!track?.previewUrl?.startsWith("https://")) return false;
+  if (!track?.previewUrl?.startsWith("https://") && !track?.previewUrl?.startsWith("http://")) return false;
   
   const aWanted = cleanStr(band.name).replace(/^the /, "");
-  const aTrack = cleanStr(track.artistName).replace(/^the /, "");
-  
+  const aTrack = cleanStr(track.artistName || track.artist?.name || "").replace(/^the /, "");
   const sWanted = cleanStr(song.title);
-  const sTrack = cleanStr(track.trackName)
+  const sTrack = cleanStr(track.trackName || track.title || "")
     .replace(/\s*(explicit|remaster(ed)?|radio edit|single version|album version|version|live)\s*/g, " ")
     .trim();
 
-  // Sehr fehlertoleranter Abgleich für Indie-Bands
   const artistMatch = aTrack.includes(aWanted) || aWanted.includes(aTrack);
+  // Strenger Song-Match: Der gesuchte Titel muss im Tracknamen vorkommen!
   const songMatch = sTrack.includes(sWanted) || sWanted.includes(sTrack);
 
   return artistMatch && songMatch;
+}
+
+function fetchDeezerJSONP(query) {
+  return new Promise((resolve) => {
+    const cb = 'dz_' + Date.now() + Math.floor(Math.random() * 10000);
+    window[cb] = (data) => {
+      delete window[cb];
+      resolve(data);
+    };
+    const script = document.createElement('script');
+    script.src = `https://api.deezer.com/search?q=${encodeURIComponent(query)}&output=jsonp&callback=${cb}`;
+    script.onerror = () => resolve(null);
+    document.body.appendChild(script);
+    
+    setTimeout(() => resolve(null), 3500);
+  });
 }
 
 async function findStudioAudio(band, song) {
   const cacheKey = band.name + "|" + song.title;
   if (previewCache.has(cacheKey)) return previewCache.get(cacheKey);
 
-  const cleanBandName = band.name.replace(/å/g, "a").replace(/Å/g, "A").replace(/ø/g, "o").replace(/Ø/g, "O");
+  const nameRaw = band.name;
+  const songRaw = song.title;
+  const nameClean = band.name.replace(/å/gi, "a").replace(/Å/gi, "A").replace(/ø/gi, "o").replace(/Ø/gi, "O").replace(/ß/gi, "ss");
+  const countries = ["DE", "NO", "SE", "US", "AT", "CH"];
 
-  // Multi-Country Loop um Geo-Blocks zu umgehen
-  const searchTerms = [`${cleanBandName} ${song.title}`, cleanBandName];
-  const countries = ["DE", "US", "AT", "CH"];
-
-  for (const term of searchTerms) {
-    for (const country of countries) {
-      try {
-        const url = `https://itunes.apple.com/search?term=${encodeURIComponent(term)}&entity=song&limit=50&country=${country}`;
-        const res = await fetch(url, { signal: AbortSignal.timeout(3500) });
-        if (!res.ok) continue;
-        const data = await res.json();
-        
-        // Geht alle 50 Ergebnisse durch, um auch versteckte Indie-Treffer zu fischen
-        for (const track of data.results) {
-          if (isSongMatch(track, band, song)) {
-            previewCache.set(cacheKey, track);
-            return track;
-          }
-        }
-      } catch (e) {}
-    }
+  // 1. ITUNES EXAKTER SUCHLAUF ÜBER 6 LÄNDER
+  for (const country of countries) {
+    try {
+      const url = `https://itunes.apple.com/search?term=${encodeURIComponent(`${nameRaw}${songRaw}`)}&entity=song&limit=30&country=${country}`;
+      const res = await fetch(url, { signal: AbortSignal.timeout(2500) });
+      if (!res.ok) continue;
+      const data = await res.json();
+      const match = data.results.find(t => isSongMatch(t, band, song));
+      if (match) {
+        previewCache.set(cacheKey, match);
+        return match;
+      }
+    } catch (e) {}
   }
 
+  // 2. DEEZER API EXAKTER SUCHLAUF
+  try {
+    let dzData = await fetchDeezerJSONP(`artist:"${nameClean}" track:"${songRaw}"`);
+    if (dzData && dzData.data && dzData.data.length > 0) {
+      const match = dzData.data.find(t => t.preview && isSongMatch({
+        artistName: t.artist.name, 
+        trackName: t.title, 
+        previewUrl: t.preview
+      }, band, song));
+
+      if (match) {
+        const mapped = { previewUrl: match.preview };
+        previewCache.set(cacheKey, mapped);
+        return mapped;
+      }
+    }
+  } catch(e) {}
+
+  // 3. DEEZER WEICHE SUCHE (Nur Songname + Bandname ohne Feldfilter)
+  try {
+    let dzData = await fetchDeezerJSONP(`${nameClean} ${songRaw}`);
+    if (dzData && dzData.data && dzData.data.length > 0) {
+      const match = dzData.data.find(t => t.preview && isSongMatch({
+        artistName: t.artist.name, 
+        trackName: t.title, 
+        previewUrl: t.preview
+      }, band, song));
+
+      if (match) {
+        const mapped = { previewUrl: match.preview };
+        previewCache.set(cacheKey, mapped);
+        return mapped;
+      }
+    }
+  } catch(e) {}
+
+  // Nichts gefunden -> Kein falsches Lied abspielen, sauberer Abbruch!
   previewCache.set(cacheKey, null);
   return null;
 }
@@ -248,16 +296,17 @@ async function toggleSongPlay(index) {
   if (currentSongIndex === index && currentAudio && !currentAudio.paused) {
     currentAudio.pause();
     row?.classList.remove("playing");
-    if (playBtn) playBtn.textContent = "▶";
+    if (playBtn) playBtn.innerHTML = "▶";
     if (stateText) stateText.textContent = "Pausiert";
     return;
   }
 
   if (currentSongIndex === index && currentAudio && currentAudio.paused) {
     try {
+      currentAudio.volume = masterVolume;
       await currentAudio.play();
       row?.classList.add("playing");
-      if (playBtn) playBtn.textContent = "⏸";
+      if (playBtn) playBtn.innerHTML = "⏸";
       if (stateText) stateText.textContent = "Hörprobe läuft";
     } catch (err) {
       if (stateText) stateText.textContent = "Wiedergabe blockiert";
@@ -274,12 +323,12 @@ async function toggleSongPlay(index) {
     r.removeAttribute("aria-busy");
     const btn = r.querySelector(".song-play-btn");
     const st = r.querySelector(".song-state-text");
-    if (btn) btn.textContent = "▶";
+    if (btn) btn.innerHTML = "▶";
     if (st) st.textContent = "Hörprobe starten";
   });
 
   if (row) row.setAttribute("aria-busy", "true");
-  if (stateText) stateText.textContent = "Lade Hörprobe …";
+  if (stateText) stateText.textContent = "Suche Stream …";
 
   const track = await findStudioAudio(band, song);
   if (thisRequest !== playRequestId || activeBand !== band) return;
@@ -288,7 +337,7 @@ async function toggleSongPlay(index) {
 
   if (!track || !track.previewUrl) {
     if (stateText) stateText.textContent = "Hörprobe nicht verfügbar";
-    if (playBtn) playBtn.textContent = "×";
+    if (playBtn) playBtn.innerHTML = "×";
     currentSongIndex = -1;
     return;
   }
@@ -296,12 +345,13 @@ async function toggleSongPlay(index) {
   const audio = new Audio();
   audio.preload = "auto";
   audio.src = track.previewUrl;
+  audio.volume = masterVolume;
   currentAudio = audio;
 
   audio.addEventListener("ended", () => {
     if (currentAudio !== audio) return;
     row?.classList.remove("playing");
-    if (playBtn) playBtn.textContent = "▶";
+    if (playBtn) playBtn.innerHTML = "▶";
     if (stateText) stateText.textContent = "Hörprobe beendet";
     currentSongIndex = -1;
   });
@@ -309,7 +359,7 @@ async function toggleSongPlay(index) {
   audio.addEventListener("error", () => {
     if (currentAudio !== audio) return;
     row?.classList.remove("playing");
-    if (playBtn) playBtn.textContent = "×";
+    if (playBtn) playBtn.innerHTML = "×";
     if (stateText) stateText.textContent = "Wiedergabefehler";
     currentSongIndex = -1;
   });
@@ -321,11 +371,11 @@ async function toggleSongPlay(index) {
       return;
     }
     row?.classList.add("playing");
-    if (playBtn) playBtn.textContent = "⏸";
+    if (playBtn) playBtn.innerHTML = "⏸";
     if (stateText) stateText.textContent = "Hörprobe läuft";
   } catch (e) {
     if (stateText) stateText.textContent = "Klick nötig";
-    if (playBtn) playBtn.textContent = "▶";
+    if (playBtn) playBtn.innerHTML = "▶";
   }
 }
 
@@ -339,7 +389,7 @@ function cardHTML(band) {
   return `
     <article class="concept-card ${isSelected ? 'active-selected' : ''}" data-band-id="${band.id}">
       <div class="concept-card-img-wrap">
-        <img data-img-band-id="${band.id}" src="assets/all-for-metal-art.webp" alt="${band.name}" loading="lazy" referrerpolicy="no-referrer">
+        <img data-img-band-id="${band.id}" src="assets/stag-skull-clean.png" alt="${band.name}" loading="lazy" referrerpolicy="no-referrer">
       </div>
       <div class="concept-card-body">
         <h3 class="concept-card-name">${band.name}</h3>
@@ -431,8 +481,11 @@ function closeDrawer() {
 }
 
 function openBand(band) {
-  stopCurrentAudio();
-  currentSongIndex = -1;
+  if (!activeBand || activeBand.id !== band.id) {
+    stopCurrentAudio();
+    currentSongIndex = -1;
+  }
+  
   activeBand = band;
 
   $("detail-title").textContent = band.name;
@@ -449,7 +502,15 @@ function openBand(band) {
   const detailImg = $("detail-img");
   detailImg.referrerPolicy = "no-referrer";
   getBandPhoto(band).then(src => {
-    detailImg.src = src || "assets/all-for-metal-art.webp";
+    if (src) {
+      detailImg.src = src;
+      detailImg.style.objectFit = "cover";
+      detailImg.style.padding = "0";
+    } else {
+      detailImg.src = "assets/stag-skull-clean.png";
+      detailImg.style.objectFit = "contain";
+      detailImg.style.padding = "20px";
+    }
   });
 
   const currentStatus = status(band.id);
@@ -460,20 +521,25 @@ function openBand(band) {
   `;
 
   $("detail-songs").innerHTML = band.songs.length
-    ? band.songs.map((song, i) => `
-      <div class="drawer-song-row" data-song-idx="${i}">
-        <div class="song-skull-icon" aria-hidden="true"></div>
-        <button class="song-play-btn" data-play="${i}" aria-label="${song.title} abspielen">▶</button>
-        <div class="song-titles">
-          <strong>${song.title}</strong>
-          <small class="song-state-text">Hörprobe starten</small>
-        </div>
-        <div class="song-waveform">
-          <span></span><span></span><span></span><span></span>
-        </div>
-        <span class="song-duration">0:30</span>
-      </div>
-    `).join("")
+    ? band.songs.map((song, i) => {
+        const isCurrentlyPlaying = (currentSongIndex === i && currentAudio && !currentAudio.paused);
+        const stateStr = isCurrentlyPlaying ? "Hörprobe läuft" : (currentSongIndex === i ? "Pausiert" : "Hörprobe starten");
+        const btnStr = isCurrentlyPlaying ? "⏸" : "▶";
+        
+        return `
+        <div class="drawer-song-row ${isCurrentlyPlaying ? 'playing' : ''}" data-song-idx="${i}">
+          <div class="song-skull-icon" aria-hidden="true"></div>
+          <button class="song-play-btn" data-play="${i}" aria-label="${song.title} abspielen">${btnStr}</button>
+          <div class="song-titles">
+            <strong>${song.title}</strong>
+            <small class="song-state-text">${stateStr}</small>
+          </div>
+          <div class="song-waveform">
+            <span></span><span></span><span></span><span></span>
+          </div>
+          <span class="song-duration">0:30</span>
+        </div>`;
+      }).join("")
     : `<div style="padding:10px; font-size:12px; color:#888;">Keine Songs hinterlegt.</div>`;
 
   render();
@@ -495,7 +561,7 @@ function navigate(targetPage) {
    --------------------------------------------------------- */
 document.addEventListener("click", e => {
   
-  // 1. Rating-Buttons (Audio läuft nahtlos weiter!)
+  // Rating-Buttons
   const rateBtn = e.target.closest("[data-rate]");
   if (rateBtn) {
     e.stopPropagation();
@@ -524,7 +590,7 @@ document.addEventListener("click", e => {
     return;
   }
 
-  // 2. Band-Auswahl über Karte
+  // Band-Auswahl
   const card = e.target.closest(".concept-card");
   if (card) {
     const bandId = card.dataset.bandId;
@@ -541,7 +607,7 @@ document.addEventListener("click", e => {
     return;
   }
 
-  // 3. Audio abspielen
+  // Audio abspielen
   const playBtn = e.target.closest("[data-play]");
   if (playBtn) {
     const idx = Number(playBtn.dataset.play);
@@ -549,13 +615,13 @@ document.addEventListener("click", e => {
     return;
   }
 
-  // 4. Logo Reset
+  // Logo Reset
   if (e.target.closest("#brand-reset")) {
     resetToAllBands();
     return;
   }
 
-  // 5. Navigation
+  // Navigation
   const nav = e.target.closest("[data-page]");
   if (nav) {
     if (nav.dataset.page === "lineup") {
@@ -566,7 +632,7 @@ document.addEventListener("click", e => {
     return;
   }
 
-  // 6. Tagesfilter
+  // Tagesfilter
   const dayBtn = e.target.closest("[data-day-filter]");
   if (dayBtn) {
     const clickedDay = dayBtn.dataset.dayFilter;
@@ -583,6 +649,19 @@ document.addEventListener("click", e => {
     return;
   }
 });
+
+/* LAUTSTÄRKEREGLER */
+const volSlider = $("master-volume");
+if (volSlider) {
+  volSlider.value = masterVolume;
+  volSlider.addEventListener("input", (e) => {
+    masterVolume = parseFloat(e.target.value);
+    localStorage.setItem(VOL_KEY, masterVolume.toString());
+    if (currentAudio) {
+      currentAudio.volume = masterVolume;
+    }
+  });
+}
 
 const resetViewBtn = $("reset-view-btn");
 if (resetViewBtn) {
@@ -601,41 +680,65 @@ $("desc-expand-btn").onclick = () => {
 
 $("search").addEventListener("input", render);
 
+/* ---------------------------------------------------------
+   OFFLINE LINE-UP GENERATOR (QUERFORMAT PDF)
+   --------------------------------------------------------- */
 $("export").onclick = () => {
-  const blob = new Blob([JSON.stringify(ratings, null, 2)], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "rockharz-2027-favoriten.json";
-  a.click();
-  URL.revokeObjectURL(url);
+  const mustBands = BANDS.filter(b => status(b.id) === "must").sort((a,b) => a.name.localeCompare(b.name));
+  const maybeBands = BANDS.filter(b => status(b.id) === "maybe").sort((a,b) => a.name.localeCompare(b.name));
+  const restBands = BANDS.filter(b => status(b.id) !== "must" && status(b.id) !== "maybe").sort((a,b) => a.name.localeCompare(b.name));
+
+  let html = `
+    <div id="print-section" style="width: 100%; font-family: 'Barlow Condensed', 'Inter', sans-serif; color: #000; background: #fff; padding: 20px;">
+      <h1 style="text-align: center; margin-top: 0; margin-bottom: 25px; text-transform: uppercase; font-size: 36px; border-bottom: 3px solid #000; padding-bottom: 10px;">
+        ROCKHARZ 2027 — MEIN LINE-UP
+      </h1>
+  `;
+
+  const renderGrid = (title, list, bgColor, borderColor, icon) => {
+    if(!list.length) return "";
+    let out = `
+      <h2 style="margin-top: 30px; font-size: 22px; border-bottom: 2px solid ${borderColor}; padding-bottom: 5px; text-transform: uppercase;">
+        ${icon} ${title} (${list.length})
+      </h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;">
+    `;
+    list.forEach(b => {
+        out += `
+          <div style="background: ${bgColor}; border: 1px solid ${borderColor}; padding: 12px; border-radius: 6px; page-break-inside: avoid;">
+            <strong style="display: block; font-size: 18px; margin-bottom: 4px;">${b.name}</strong>
+            <span style="font-size: 12px; color: #333;">${b.genre}</span>
+          </div>
+        `;
+    });
+    out += `</div>`;
+    return out;
+  };
+
+  html += renderGrid("PFLICHT-BANDS", mustBands, "#ffebe6", "#e65a28", "★");
+  html += renderGrid("VIELLEICHT", maybeBands, "#fff8e6", "#e5a455", "◉");
+  html += renderGrid("RESTLICHES LINE-UP", restBands, "#f5f5f5", "#ccc", "◇");
+
+  html += `</div>`;
+
+  const printDiv = document.createElement("div");
+  printDiv.id = "print-section";
+  printDiv.innerHTML = html;
+  document.body.appendChild(printDiv);
+  
+  window.print();
+  document.body.removeChild(printDiv);
 };
 
-$("import").onclick = () => $("import-file").click();
-
-$("import-file").onchange = async event => {
-  const file = event.target.files[0];
-  if (!file) return;
-  try {
-    const data = JSON.parse(await file.text());
-    if (data && typeof data === "object") {
-      ratings = data;
-      persist();
-      render();
-      alert("Favoriten erfolgreich importiert!");
-    }
-  } catch (err) {
-    alert("Ungültige Importdatei.");
-  }
-  event.target.value = "";
-};
-
+// Start
 render();
-if (BANDS.length > 0) {
-  openBand(BANDS[0]);
-  if (window.innerWidth <= 900) {
-    $("detail-drawer").classList.add("hidden");
-  }
+if (window.innerWidth <= 900) {
+  $("detail-drawer").classList.add("hidden");
+  if (BANDS.length > 0) openBand(BANDS[0]);
+  $("detail-drawer").classList.add("hidden");
+  if (backdrop) backdrop.classList.add("hidden");
+} else {
+  if (BANDS.length > 0) openBand(BANDS[0]);
 }
 
 window.addEventListener("load", () => {

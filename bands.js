@@ -1,7 +1,7 @@
 "use strict";
 
-/* ROCKHARZ 2027 — OFFIZIELL BESTÄTIGTE BANDS
-   Geprüfte Songtitel mit funktionierenden Apple-Music-Hörproben.
+/* ROCKHARZ 2027 — DIE OFFIZIELLEN 29 BANDS DER ERSTEN BANDWELLE
+   Keine erfundenen Acts.
 */
 
 const BAND_DATA = [
@@ -48,13 +48,6 @@ const BAND_DATA = [
     songs: ["Risiko", "Moor", "Operation"]
   },
   {
-    name: "Corvus Corax",
-    genre: "Mittelalter Rock",
-    website: "https://www.corvuscorax.de",
-    desc: "Die Könige der Spielleute: Riesige historische Dudelsäcke und gigantische Davul-Trommeln erzeugen archaische, treibende Rhythmen voller Wucht.",
-    songs: ["In Taberna", "Sverker", "Ragnarök"]
-  },
-  {
     name: "D'Artagnan",
     genre: "Folk Rock",
     website: "https://dartagnan.de",
@@ -88,13 +81,6 @@ const BAND_DATA = [
     website: "https://equilibrium-metal.net",
     desc: "Epische Hymnen, bombastische Orchester-Elemente und rasendes Riffing vereinen sich zu einer gewaltigen bayerischen Metal-Wand.",
     songs: ["Blut im Auge", "Unbesiegt", "Wirtshaus Gaudi"]
-  },
-  {
-    name: "Gloryhammer",
-    genre: "Power Metal",
-    website: "https://gloryhammer.com",
-    desc: "Galaktischer Fantasy-Power-Metal mit glasklarem Gesang, treibenden Doublebass-Salven und der herrlich überdrehten Saga um Angus McFife.",
-    songs: ["Angus McFife", "Universe on Fire", "Fly Away"]
   },
   {
     name: "Grave Digger",
@@ -172,6 +158,13 @@ const BAND_DATA = [
     website: "https://metalchurchofficial.com",
     desc: "Pioniere der US-Power- und Thrash-Szene: Komplexe Riffkaskaden und zeitlose US-Metal-Hymnen aus der Blütezeit der 80er.",
     songs: ["Beyond the Black", "Metal Church", "Badlands"]
+  },
+  {
+    name: "Nestor",
+    genre: "AOR / Hard Rock",
+    website: "https://nestortheband.com",
+    desc: "Purer 80s-Arena-Rock aus Schweden: Riesige Melodiebögen, hymnische Synthesizer und nostalgische Melodic-Rock-Perfektion.",
+    songs: ["On the Run", "1989", "Perfect 10 (Eyes Like Demi Moore)"]
   },
   {
     name: "Setyøursails",

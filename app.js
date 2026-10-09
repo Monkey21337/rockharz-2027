@@ -610,7 +610,6 @@ $("import-file").onchange = async event => {
 
 // Start
 render();
-// Auf Desktop automatisch Accept öffnen, auf Mobile Drawer standardmäßig zu lassen
-if (window.innerWidth > 900 && BANDS.length > 0) {
-  openBand(BANDS[0]);
+if (BANDS.length > 0) {
+  openBand(BANDS.find(b => b.id === "accept") || BANDS[0]);
 }

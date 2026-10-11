@@ -26,7 +26,7 @@ const BAND_DATA = [
   },
   {
     name: "Arch Enemy", genre: "Melodic Death Metal", website: "https://www.archenemy.net",
-    desc: "Arch Enemy gehören seit über zwei Jahrzehnten zur weltweiten Speerspitze des Melodic Death Metal. Mit der neuen Frontfrau Lauren Hart (ex-Once Human) am Mikrofon entfesseln die schwedischen Ikonen ein neues Kapitel voller brachialer Riffs und kompromissloser Wucht.",
+    desc: "Speerspitze des Melodic Death Metal – jetzt mit Frontfrau Lauren Hart (ex-Once Human) und brachialen Riffs.",
     songs: ["Nemesis", "War Eternal", "The Eagle Flies Alone"],
     day: null
   },

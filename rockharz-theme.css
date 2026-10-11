@@ -27,8 +27,9 @@
   --rh-muted: #8fa1ba;       /* kühles Schieferblau, kein Grau */
 
   --rh-nav-h: 60px;
-  /* exakt im Bildformat 2400×347 bis 300px Höhe (≈ 2075px Fensterbreite) */
-  --rh-banner-h: min(300px, calc(100vw * 347 / 2400));
+  /* exakt im Bildformat 5088×832 bis 320px Höhe (≈ 1960px Fensterbreite) */
+  --rh-banner-h: min(300px, calc(100vw * 832 / 5088));
+  --rh-banner-src: url("assets/banner-desktop-2027.jpg");
 
   /* Schiefer-Körnung: zwei Turbulenz-Ebenen (fein + grob) */
   --rh-noise: url("data:image/svg+xml,%3Csvg viewBox='0 0 240 240' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.75 0 0 0 0 0.8 0 0 0 0 0.9 0 0 0 0.55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
@@ -110,7 +111,7 @@ button { cursor: pointer; touch-action: manipulation; }
   content: "";
   position: absolute;
   inset: -20px;
-  background: url("assets/rockharz-banner-2027.jpg") center / cover no-repeat;
+  background: var(--rh-banner-src) center / cover no-repeat;
   filter: blur(14px) brightness(0.45);
 }
 
@@ -708,7 +709,7 @@ aside.band-detail-drawer {
   to { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
-.song-titles { flex: 1 1 0; min-width: 0; height: 34px; overflow: hidden; }
+.song-titles { flex: 1 1 0; min-width: 0; height: 34px; overflow: hidden; display: flex; align-items: center; }
 /* beim Abspielen Platz für die Waveform freihalten (Breite ändert sich, Höhe nie) */
 .drawer-song-row.playing .song-titles { margin-right: 100px; }
 .song-titles strong {
@@ -739,6 +740,53 @@ aside.band-detail-drawer {
   text-overflow: ellipsis;
 }
 .amazon-link:hover { color: #e4bc70; text-decoration: underline; }
+
+/* Band-Link rechts neben "Tracklist" – kostet keine eigene Zeile */
+.drawer-tracklist-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.band-amazon-link {
+  height: auto;
+  margin: -8px -6px -8px 0;
+  padding: 8px 6px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+/* Vor/Zurück: runde Eisen-Buttons auf dem Bandfoto, nur im mobilen Player */
+.drawer-step {
+  display: none;
+  position: absolute;
+  top: 50%;
+  z-index: 3;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  place-items: center;
+  transform: translateY(-50%);
+  background: radial-gradient(circle at 50% 35%, rgba(46, 64, 88, 0.85), rgba(6, 9, 14, 0.85));
+  border: 1px solid #5a7090;
+  border-radius: 50%;
+  color: #eef2f8;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transition: border-color 0.15s, color 0.15s, opacity 0.15s;
+}
+.drawer-step.prev { left: 14px; }
+.drawer-step.next { right: 14px; }
+.drawer-step svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.drawer-step:active:not(:disabled) { border-color: var(--rh-copper); color: var(--rh-copper); }
+.drawer-step:disabled { opacity: 0.25; cursor: default; }
+
+/* kurzer Gleiteffekt beim Bandwechsel, in Blätterrichtung */
+.drawer-scroll.swap-next { animation: rh-swap-next 0.22s ease-out; }
+.drawer-scroll.swap-prev { animation: rh-swap-prev 0.22s ease-out; }
+@keyframes rh-swap-next { from { opacity: 0.35; transform: translateX(14px); } to { opacity: 1; transform: none; } }
+@keyframes rh-swap-prev { from { opacity: 0.35; transform: translateX(-14px); } to { opacity: 1; transform: none; } }
 
 /* Kupfer-Waveform: absolut positioniert, nur sichtbar beim Abspielen -> kein Springen */
 .song-waveform {
@@ -964,14 +1012,17 @@ aside.band-detail-drawer {
 
   .player-frame { border-width: 44px; border-image-width: 44px; }
   .drawer-close { top: 20px; right: 40px; width: 40px; height: 40px; font-size: 16px; }
+  .drawer-step { display: grid; }
+  /* waagerechtes Wischen gehört der App (Bandwechsel), senkrechtes Scrollen dem Browser */
+  .drawer-scroll { touch-action: pan-y; }
   .drawer-volume-section { padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px)); }
 }
 
 /* Handy: Banner auf das Logo zuschneiden, damit der Schriftzug lesbar bleibt */
 @media (max-width: 600px) {
-  .hero-banner-wrapper { height: clamp(96px, 28vw, 150px); }
-  .hero-banner-wrapper::before { display: none; }
-  .hero-banner-img { object-fit: cover; }
+  /* eigenes Handy-Motiv (3168×1344), vollständig sichtbar */
+  :root { --rh-banner-src: url("assets/banner-mobile-2027.jpg"); }
+  .hero-banner-wrapper { height: min(200px, calc(100vw * 1344 / 3168)); }
   .nav-tab { flex-direction: column; justify-content: center; gap: 0; line-height: 1.15; min-height: 48px; }
   .nav-tabs { height: auto; }
   .tab-count { font-size: 13px; }

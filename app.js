@@ -106,7 +106,7 @@ const cleanStr = value =>
    --------------------------------------------------------- */
 const WIKI_TITLES = {
   "Accept": "Accept_(band)", "All for Metal": "All_for_Metal", "Arch Enemy": "Arch_Enemy",
-  "Bruce Dickinson": "Bruce_Dickinson", "Corvus Corax": "Corvus_Corax_(band)",
+  "Bruce Dickinson": "Bruce_Dickinson",
   "D'Artagnan": "DArtagnan_(band)", "Dust Bolt": "Dust_Bolt", "Eisbrecher": "Eisbrecher_(band)",
   "Equilibrium": "Equilibrium_(band)", "Grave Digger": "Grave_Digger_(band)", "GWAR": "Gwar",
   "Marduk": "Marduk_(band)", "Nestor": "Nestor_(band)", "SKÁLD": "Skáld",
@@ -1199,6 +1199,7 @@ function render() {
   $("nav-count-unrated").textContent = BANDS.filter(b => status(b.id) === "new").length;
 
   loadCardPhotos();
+  if (activeBand) updateStepButtons();
 }
 
 function ratingButtonsHTML(id) {
@@ -1214,15 +1215,12 @@ function ratingButtonsHTML(id) {
 
 function songRowHTML(band, song, index) {
   const title = escapeHTML(song.title);
-  // Suchbegriff ohne Sonderzeichen und Zusätze: "Håndgemeng" -> "Handgemeng", "(Remaster …)" / "[Live …]" entfällt
-  const amazon = "https://music.amazon.de/search/" + encodeURIComponent(foldText(searchName(band) + " " + songTerm(song)));
   const bars = WAVE_HEIGHTS.map((h, n) => `<span style="--bar-height:${h}%;--delay:${(n * 0.07).toFixed(2)}s"></span>`).join("");
   return `
     <div class="drawer-song-row" data-song-idx="${index}" data-title="${title}" data-state="idle">
       <button type="button" class="song-play-btn" data-play="${index}" aria-label="${title} abspielen" aria-pressed="false"></button>
       <div class="song-titles">
         <strong title="${title}">${title}</strong>
-        <a href="${amazon}" target="_blank" rel="noopener noreferrer" class="amazon-link" title="Auf Amazon Music suchen">Amazon Music ↗</a>
         <small class="song-state-text" role="status"></small>
       </div>
       <div class="song-waveform" aria-hidden="true">${bars}</div>
@@ -1251,6 +1249,10 @@ function openBand(band) {
   $("detail-title").textContent = band.name;
   $("detail-meta").textContent = [band.genre, band.origin].filter(Boolean).join(" · ");
   $("detail-desc").textContent = band.description;
+  // Ein Link pro Band; Suchbegriff ohne Sonderzeichen ("Håndgemeng" -> "Handgemeng")
+  const amazon = $("detail-amazon");
+  amazon.href = "https://music.amazon.de/search/" + encodeURIComponent(foldText(searchName(band)));
+  amazon.setAttribute("aria-label", band.name + " auf Amazon Music öffnen (neuer Tab)");
   setDrawerOpen(true);
   $("detail-drawer").querySelector(".drawer-scroll").scrollTop = 0;
 
@@ -1281,6 +1283,54 @@ function openBand(band) {
   render();
 }
 
+/* ---- Vor/Zurück im Player: blättert durch die aktuell sichtbaren Kacheln (Ansicht + Suche) ---- */
+const visibleBandIds = () =>
+  [...document.querySelectorAll(".page:not(.hidden) .concept-card")].map(card => card.dataset.bandId);
+
+function neighbourBand(dir) {
+  const ids = visibleBandIds();
+  if (!activeBand || !ids.length) return null;
+  const index = ids.indexOf(activeBand.id);
+  // Band nicht mehr in der Liste (z. B. gerade bewertet in "Unbewertet"): am Anfang bzw. Ende einsteigen
+  const target = index < 0 ? ids[dir > 0 ? 0 : ids.length - 1] : ids[(index + dir + ids.length) % ids.length];
+  return target === activeBand.id ? null : BANDS.find(band => band.id === target) || null;
+}
+
+function updateStepButtons() {
+  [[-1, "drawer-prev"], [1, "drawer-next"]].forEach(([dir, id]) => {
+    const band = neighbourBand(dir);
+    $(id).disabled = !band;
+    $(id).setAttribute("aria-label", band ? (dir < 0 ? "Vorherige Band: " : "Nächste Band: ") + band.name : "Keine weitere Band");
+  });
+}
+
+function stepBand(dir) {
+  const band = neighbourBand(dir);
+  if (!band) return;
+  const scroller = $("detail-drawer").querySelector(".drawer-scroll");
+  scroller.classList.remove("swap-next", "swap-prev");
+  void scroller.offsetWidth; // Animation neu starten
+  scroller.classList.add(dir > 0 ? "swap-next" : "swap-prev");
+  openBand(band);
+  document.querySelector(`.page:not(.hidden) .concept-card[data-band-id="${band.id}"]`)?.scrollIntoView({ block: "nearest" });
+}
+
+// Wischen im mobilen Player (Lautstärkeregler ausgenommen)
+(() => {
+  const drawer = $("detail-drawer");
+  let start = null;
+  drawer.addEventListener("touchstart", event => {
+    start = event.touches.length === 1 && !event.target.closest("input") ? { x: event.touches[0].clientX, y: event.touches[0].clientY } : null;
+  }, { passive: true });
+  drawer.addEventListener("touchend", event => {
+    if (!start) return;
+    const dx = event.changedTouches[0].clientX - start.x;
+    const dy = event.changedTouches[0].clientY - start.y;
+    start = null;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) stepBand(dx < 0 ? 1 : -1);
+  }, { passive: true });
+})();
+
 function navigate(page) {
   document.querySelectorAll(".page").forEach(el => el.classList.toggle("hidden", el.id !== "page-" + page));
   document.querySelectorAll(".nav-tab").forEach(el => el.classList.toggle("active", el.dataset.page === page));
@@ -1305,6 +1355,9 @@ document.addEventListener("click", event => {
   const playBtn = event.target.closest("[data-play]");
   if (playBtn) { toggleSongPlay(Number(playBtn.dataset.play)); return; }
 
+  const stepBtn = event.target.closest("[data-step]");
+  if (stepBtn) { stepBand(Number(stepBtn.dataset.step)); return; }
+
   if (event.target.closest(".amazon-link")) return; // normaler Link
 
   const card = event.target.closest(".concept-card");
@@ -1320,8 +1373,15 @@ document.addEventListener("click", event => {
 
 // Kacheln sind per Tastatur bedienbar.
 document.addEventListener("keydown", event => {
-  if (event.key === "Escape" && !$("detail-drawer").classList.contains("hidden")) {
+  const drawerOpen = !$("detail-drawer").classList.contains("hidden");
+  if (event.key === "Escape" && drawerOpen) {
     closeDrawer();
+    return;
+  }
+  // Pfeiltasten blättern zur vorherigen/nächsten Band (nicht beim Tippen oder am Lautstärkeregler)
+  if (drawerOpen && (event.key === "ArrowLeft" || event.key === "ArrowRight") && !event.target.closest("input, textarea")) {
+    event.preventDefault();
+    stepBand(event.key === "ArrowRight" ? 1 : -1);
     return;
   }
   if ((event.key === "Enter" || event.key === " ") && event.target.matches(".concept-card")) {

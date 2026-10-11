@@ -8,14 +8,17 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Cinzel:wght@700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="rockharz-theme.css?v=302">
+  <link rel="stylesheet" href="rockharz-theme.css?v=303">
 </head>
 <body>
 
-  <!-- HEADER: Panorama mit Vollmond-Schloss, Dämonenhirschen und Schriftzug -->
+  <!-- HEADER: Panorama (Desktop) bzw. kompaktes Motiv (Handy) -->
   <header class="hero-banner-container">
     <div class="hero-banner-wrapper">
-      <img src="assets/rockharz-banner-2027.jpg?v=302" alt="ROCKHARZ 2027 · Ballenstedt, Germany · 07.–10. Juli 2027 · Rock statt Reha" class="hero-banner-img" fetchpriority="high">
+      <picture>
+        <source media="(max-width: 600px)" srcset="assets/banner-mobile-2027.jpg?v=303">
+        <img src="assets/banner-desktop-2027.jpg?v=303" alt="ROCKHARZ 2027 · Ballenstedt, Germany · 07.–10. Juli 2027 · Rock statt Reha" class="hero-banner-img" fetchpriority="high">
+      </picture>
     </div>
   </header>
 
@@ -77,6 +80,13 @@
             <img id="detail-img" src="" alt="" class="hidden" referrerpolicy="no-referrer">
             <div class="stag-relief-fallback" id="detail-fallback" aria-hidden="true"></div>
           </div>
+          <!-- Vor/Zurück (mobil sichtbar; zusätzlich Wischen und Pfeiltasten) -->
+          <button type="button" class="drawer-step prev" id="drawer-prev" data-step="-1" aria-label="Vorherige Band">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+          </button>
+          <button type="button" class="drawer-step next" id="drawer-next" data-step="1" aria-label="Nächste Band">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+          </button>
         </div>
 
         <div class="drawer-content">
@@ -85,7 +95,10 @@
 
           <p id="detail-desc" class="concept-desc"></p>
 
-          <div class="drawer-section-title">TRACKLIST (HÖRPROBEN)</div>
+          <div class="drawer-section-title drawer-tracklist-head">
+            <span>TRACKLIST (HÖRPROBEN)</span>
+            <a id="detail-amazon" class="amazon-link band-amazon-link" href="https://music.amazon.de" target="_blank" rel="noopener noreferrer">Amazon Music ↗</a>
+          </div>
           <div class="drawer-songs-list" id="detail-songs"></div>
 
           <div class="drawer-ratings-block" id="detail-rating-btns" role="group" aria-label="Deine Festival-Wertung"></div>
@@ -105,7 +118,7 @@
   </div>
 
   <audio id="preview-audio" preload="none"></audio>
-  <script src="bands.js?v=302"></script>
-  <script src="app.js?v=302"></script>
+  <script src="bands.js?v=303"></script>
+  <script src="app.js?v=303"></script>
 </body>
 </html>

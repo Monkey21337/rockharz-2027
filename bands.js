@@ -43,12 +43,6 @@ const BAND_DATA = [
     day: null
   },
   {
-    name: "Corvus Corax", genre: "Mittelalter Rock", website: "https://www.corvuscorax.de",
-    desc: "Die Könige der Spielleute: Riesige historische Dudelsäcke und gigantische Davul-Trommeln.",
-    songs: ["Sverker", "In Taberna", "Ragnarök"],
-    day: null
-  },
-  {
     name: "D'Artagnan", genre: "Folk Rock", website: "https://dartagnan.de",
     desc: "Eingängiger Musketier-Rock mit Dudelsack, Geige und Mitsing-Refrains.",
     songs: ["Seit an Seit", "Was wollen wir trinken", "C'est la vie"],
@@ -191,7 +185,7 @@ const BAND_DATA = [
 const ORIGINS = {
   "Accept": "Deutschland", "Alestorm": "Schottland", "All for Metal": "Deutschland / Italien",
   "Arch Enemy": "Schweden", "Bruce Dickinson": "Großbritannien", "Coppelius": "Deutschland",
-  "Corvus Corax": "Deutschland", "D'Artagnan": "Deutschland", "Dust Bolt": "Deutschland",
+  "D'Artagnan": "Deutschland", "Dust Bolt": "Deutschland",
   "Eisbrecher": "Deutschland", "Emil Bulls": "Deutschland", "Equilibrium": "Deutschland",
   "Grave Digger": "Deutschland", "Gutalax": "Tschechien", "GWAR": "USA",
   "Håndgemeng": "Norwegen", "H-Blockx": "Deutschland", "Igel vs. Shark": "Deutschland",

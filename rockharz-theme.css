@@ -298,6 +298,32 @@ button { cursor: pointer; touch-action: manipulation; }
 }
 #reset-view-btn:hover { color: #fff; }
 
+/* Camp-Name (oben rechts neben der Suche) */
+.camp-user-btn {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 200px;
+  height: 44px;
+  padding: 0 14px;
+  background: linear-gradient(180deg, #1a2636 0%, #0b1119 100%);
+  border: 1px solid #3f536d;
+  border-radius: 3px;
+  color: #dfe6ef;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  box-shadow: inset 0 1px 0 rgba(160, 180, 205, 0.2), 0 2px 5px rgba(0, 0, 0, 0.6);
+  transition: border-color 0.15s, color 0.15s;
+}
+.camp-user-btn:hover { border-color: #7189a8; color: #fff; }
+.camp-user-btn svg { width: 18px; height: 18px; flex: none; fill: none; stroke: var(--rh-gold); stroke-width: 2; stroke-linecap: round; }
+.camp-user-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* ohne Verbindung: gestrichelte Kante als stiller Hinweis */
+.camp-user-btn.offline { border-style: dashed; }
+.camp-user-btn.offline svg { stroke: var(--rh-muted); }
+
 /* =========================================================
    3. LAYOUT — nur das Grid scrollt
    ========================================================= */
@@ -475,6 +501,28 @@ button { cursor: pointer; touch-action: manipulation; }
   box-shadow: 0 0 10px rgba(46, 213, 115, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.25);
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.8);
 }
+
+/* Camp-Zähler: nur Symbol + Zahl (Altgold), oben rechts auf der Kachel */
+.camp-count-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px 3px 6px;
+  font-family: var(--rh-ui);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 16px;
+  font-variant-numeric: tabular-nums;
+  color: #f1dcae;
+  background: rgba(6, 9, 14, 0.82);
+  border: 1px solid rgba(197, 155, 72, 0.75);
+  border-radius: 999px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  pointer-events: none;
+}
+.camp-count-badge[hidden] { display: none; }
+.camp-count-badge svg { width: 15px; height: 15px; flex: none; fill: none; stroke: var(--rh-gold); stroke-width: 2; stroke-linecap: round; }
+.card-camp-count { position: absolute; z-index: 5; top: 14px; right: 16px; }
 
 /* Aktive Band: giftgrüner Smaragd-Glow (außen + Rahmen + innen) */
 .concept-card.active-selected {
@@ -758,6 +806,95 @@ aside.band-detail-drawer {
   text-transform: none;
 }
 
+/* Camp-Zähler im Player: oben links auf dem Bandfoto, kostet keine Höhe */
+/* gespiegelt zum [✕]-Button, frei von der Eckverzierung des Rahmens */
+.drawer-camp-count { position: absolute; z-index: 3; top: 18px; left: 40px; font-size: 14px; }
+
+/* Namens-Modal im Schattenwald-Stil */
+.camp-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(2, 5, 11, 0.86);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+}
+.camp-modal-backdrop[hidden] { display: none; }
+.camp-modal {
+  position: relative;
+  width: min(440px, 100%);
+  padding: 46px 42px 38px;
+  background-color: var(--rh-slate);
+  background-image:
+    radial-gradient(ellipse 120% 70% at 50% 0%, rgba(46, 64, 88, 0.45), transparent 70%),
+    linear-gradient(rgba(14, 22, 34, 0.65), rgba(14, 22, 34, 0.65)),
+    var(--rh-grit);
+  background-size: auto, auto, 600px 600px;
+  border-radius: 6px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.95);
+  animation: rh-modal-in 0.22s ease-out;
+}
+@keyframes rh-modal-in { from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: none; } }
+.camp-modal h2 {
+  margin: 0 0 8px;
+  font-family: var(--rh-display);
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #fff;
+  text-shadow: 0 2px 4px #000;
+}
+.camp-modal-hint {
+  margin: 0 0 22px;
+  font-family: var(--rh-body);
+  font-size: 14px;
+  line-height: 1.5;
+  color: #b9c6d6;
+}
+.camp-modal label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--rh-gold);
+}
+.camp-modal input {
+  display: block;
+  width: 100%;
+  height: 48px;
+  padding: 0 14px;
+  background: linear-gradient(180deg, #05080c 0%, #0a1018 100%);
+  border: 1px solid #3f536d;
+  border-radius: 3px;
+  color: #fff;
+  font-size: 18px;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.85);
+  outline: none;
+}
+.camp-modal input:focus { border-color: var(--rh-copper); box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.85), 0 0 0 2px rgba(230, 103, 34, 0.35); }
+.camp-modal-error { margin: 8px 0 0; font-size: 15px; color: #ff9a6b; }
+.camp-modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; }
+.camp-modal-actions button { min-height: 46px; padding: 0 20px; border-radius: 3px; font-size: 16px; font-weight: 700; letter-spacing: 0.05em; }
+.camp-modal-cancel {
+  background: linear-gradient(180deg, #1a2636 0%, #0b1119 100%);
+  border: 1px solid #3f536d;
+  color: #c8d4e3;
+}
+.camp-modal-cancel:hover { border-color: #7189a8; color: #fff; }
+.camp-modal-save {
+  background: linear-gradient(180deg, #c9581b 0%, #93390d 55%, #66250a 100%);
+  border: 1px solid #f07a36;
+  color: #fff3ea;
+  font-family: var(--rh-display);
+  text-shadow: 0 1px 2px rgba(60, 15, 0, 0.9);
+  box-shadow: 0 0 14px rgba(230, 103, 34, 0.35), inset 0 1px 0 rgba(255, 220, 190, 0.4);
+}
+.camp-modal-save:hover { filter: brightness(1.1); }
+
 /* Vor/Zurück: runde Eisen-Buttons auf dem Bandfoto, nur im mobilen Player */
 .drawer-step {
   display: none;
@@ -958,6 +1095,8 @@ aside.band-detail-drawer {
   .action-bar-right { gap: 10px; }
   .nav-tab { padding: 0 12px; font-size: 13px; }
   .export-pdf-btn { padding: 0 12px; font-size: 12px; }
+  .camp-user-btn { max-width: 140px; padding: 0 10px; font-size: 14px; }
+  .search-box { min-width: 120px; }
   .rating-choice-btn { font-size: 13px; }
   .drawer-content, .drawer-volume-section { padding-left: 16px; padding-right: 16px; }
 }
@@ -1026,7 +1165,14 @@ aside.band-detail-drawer {
   .nav-tab { flex-direction: column; justify-content: center; gap: 0; line-height: 1.15; min-height: 48px; }
   .nav-tabs { height: auto; }
   .tab-count { font-size: 13px; }
-  .export-pdf-btn { flex: none; }
+  .export-pdf-btn { flex: none; padding: 0 14px; }
+  .export-label-long { display: none; }
+  .camp-user-btn { max-width: 104px; padding: 0 10px; gap: 6px; font-size: 14px; }
+  .search-box { min-width: 0; padding: 0 10px; }
+  .camp-modal { padding: 40px 28px 30px; }
+  .camp-modal h2 { font-size: 22px; }
+  .card-camp-count { top: 10px; right: 12px; font-size: 12.5px; padding: 2px 7px 2px 5px; }
+  .card-camp-count svg { width: 13px; height: 13px; }
   .concept-card-name { font-size: 12.5px; padding: 0 12px 11px; }
   .song-titles strong { font-size: 16px; }
 }

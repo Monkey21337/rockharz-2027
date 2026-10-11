@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Cinzel:wght@700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="rockharz-theme.css?v=303">
+  <link rel="stylesheet" href="rockharz-theme.css?v=305">
 </head>
 <body>
 
@@ -35,13 +35,17 @@
       <div class="action-bar-right">
         <button type="button" class="export-pdf-btn" id="export" title="Line-Up als PDF drucken">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5M4 20h16"/></svg>
-          EXPORT PDF
+          <span><span class="export-label-long">EXPORT </span>PDF</span>
         </button>
         <div class="search-box">
           <svg viewBox="0 0 24 24" fill="none" stroke="#c4cfdc" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l5 5"/></svg>
           <input type="search" id="search" placeholder="Bands suchen ..." aria-label="Bands suchen" autocomplete="off">
           <button type="button" id="reset-view-btn" class="hidden" title="Suche leeren" aria-label="Suche leeren">✕</button>
         </div>
+        <button type="button" class="camp-user-btn" id="camp-user-btn">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c0-3.9 3.1-6.4 7-6.4s7 2.5 7 6.4"/></svg>
+          <span class="camp-user-name" id="camp-user-name">Name festlegen</span>
+        </button>
       </div>
     </div>
   </nav>
@@ -80,6 +84,8 @@
             <img id="detail-img" src="" alt="" class="hidden" referrerpolicy="no-referrer">
             <div class="stag-relief-fallback" id="detail-fallback" aria-hidden="true"></div>
           </div>
+          <!-- Camp-Zähler: nur Symbol + Zahl, keine Namen -->
+          <div class="camp-count-badge drawer-camp-count" id="detail-camp-count" role="status" hidden></div>
           <!-- Vor/Zurück (mobil sichtbar; zusätzlich Wischen und Pfeiltasten) -->
           <button type="button" class="drawer-step prev" id="drawer-prev" data-step="-1" aria-label="Vorherige Band">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
@@ -117,8 +123,27 @@
 
   </div>
 
+  <!-- CAMP-NAME: einmal festlegen, auf Handy und PC denselben Namen nutzen -->
+  <div class="camp-modal-backdrop" id="camp-modal" hidden>
+    <form class="camp-modal" id="camp-modal-form" role="dialog" aria-modal="true" aria-labelledby="camp-modal-title" aria-describedby="camp-modal-hint" novalidate>
+      <span class="player-frame" aria-hidden="true"></span>
+      <h2 id="camp-modal-title">Willkommen im Camp</h2>
+      <p class="camp-modal-hint" id="camp-modal-hint">Nimm auf Handy und PC denselben Namen – dann sind deine Favoriten überall gleich.</p>
+      <label for="camp-name-input">Dein Name / Spitzname im Camp</label>
+      <input type="text" id="camp-name-input" maxlength="30" autocomplete="nickname" autocapitalize="words" spellcheck="false" required>
+      <p class="camp-modal-error" id="camp-name-error" role="alert" hidden></p>
+      <div class="camp-modal-actions">
+        <button type="button" class="camp-modal-cancel" id="camp-modal-cancel">Später</button>
+        <button type="submit" class="camp-modal-save">Speichern</button>
+      </div>
+    </form>
+  </div>
+
   <audio id="preview-audio" preload="none"></audio>
-  <script src="bands.js?v=303"></script>
-  <script src="app.js?v=303"></script>
+  <!-- Firebase (Compat-CDN, ohne Build-Tools); fällt bei Blockade sauber auf lokales Speichern zurück -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+  <script src="bands.js?v=304"></script>
+  <script src="app.js?v=304"></script>
 </body>
 </html>

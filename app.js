@@ -1174,6 +1174,7 @@ function cardHTML(band) {
         <div class="stag-relief-fallback${cached ? " hidden" : ""}" aria-hidden="true"></div>
       </div>
       <div class="card-frame-overlay" aria-hidden="true"></div>
+      ${campCountBadgeHTML(band.id)}
       <h3 class="concept-card-name">${name}</h3>
     </article>`;
 }
@@ -1199,7 +1200,7 @@ function render() {
   $("nav-count-unrated").textContent = BANDS.filter(b => status(b.id) === "new").length;
 
   loadCardPhotos();
-  if (activeBand) updateStepButtons();
+  if (activeBand) { updateStepButtons(); updateDetailCampCount(); }
 }
 
 function ratingButtonsHTML(id) {
@@ -1339,16 +1340,212 @@ function navigate(page) {
 }
 
 /* ---------------------------------------------------------
+   CAMP-VOTING (Firebase Realtime Database)
+   Pfad: /ratings/{bandId}/{userKey} = { name, status: "favorite"|"maybe"|"skip", timestamp }
+   Gleicher Name auf Handy und PC = gleicher userKey = dieselben Bewertungen.
+   In der Oberfläche erscheinen nur Zahlen, Namen ausschließlich im PDF-Export.
+   --------------------------------------------------------- */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDhDkObnPJ9UsjSdgwxWQGZ1hmn5LKSzjY",
+  authDomain: "rockharz-bands.firebaseapp.com",
+  databaseURL: "https://rockharz-bands-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "rockharz-bands",
+  storageBucket: "rockharz-bands.firebasestorage.app",
+  messagingSenderId: "659115908192",
+  appId: "1:659115908192:web:2b8373a258ef376d207705"
+};
+const USER_STORE = { name: "rockharz_user_name", key: "rockharz_user_key" };
+const TO_REMOTE = { must: "favorite", maybe: "maybe", skip: "skip" };   // App-Status -> Firebase
+const FROM_REMOTE = { favorite: "must", maybe: "maybe", skip: "skip" }; // Firebase -> App-Status
+
+const makeUserKey = name => String(name || "").trim().toLowerCase().replace(/[^a-z0-9äöüß]/g, "_");
+const lsGet = key => { try { return localStorage.getItem(key) || ""; } catch { return ""; } };
+const lsSet = (key, value) => { try { localStorage.setItem(key, value); } catch {} };
+
+let userName = lsGet(USER_STORE.name);
+let userKey = lsGet(USER_STORE.key) || makeUserKey(userName);
+let campDb = null;
+let campRatings = {};      // bandId -> { userKey: { name, status, timestamp } }
+let campLoaded = false;    // erster Snapshot angekommen?
+let pendingRate = null;    // Bewertung, die vor dem Namen geklickt wurde
+
+const campVotes = bandId => Object.values(campRatings[bandId] || {}).filter(vote => vote && vote.status === "favorite");
+const peopleIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 19c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"/><circle cx="17" cy="9" r="2.6"/><path d="M15.5 13.7c.5-.1 1-.2 1.5-.2 2.6 0 4.5 1.8 4.5 4.6"/></svg>';
+
+function campCountBadgeHTML(bandId) {
+  const count = campVotes(bandId).length;
+  if (!count) return "";
+  return `<span class="camp-count-badge card-camp-count" aria-label="${count} aus dem Camp ${count === 1 ? "will" : "wollen"} die Band sehen">${peopleIcon}${count}</span>`;
+}
+
+function updateDetailCampCount() {
+  const badge = $("detail-camp-count");
+  const count = activeBand ? campVotes(activeBand.id).length : 0;
+  badge.hidden = !count;
+  if (count) badge.innerHTML = `${peopleIcon}<span>${count} ${count === 1 ? "will" : "wollen"} die Band sehen</span>`;
+}
+
+function updateUserButton() {
+  $("camp-user-name").textContent = userName || "Name festlegen";
+  $("camp-user-btn").setAttribute("aria-label", userName ? `Angemeldet als ${userName} – Namen ändern` : "Namen für das Camp-Voting festlegen");
+}
+
+function setSyncState(online) {
+  $("camp-user-btn").classList.toggle("offline", !online);
+  $("camp-user-btn").title = online
+    ? "Live mit dem Camp synchronisiert"
+    : "Keine Verbindung – Bewertungen werden lokal gespeichert und später nicht automatisch übertragen";
+}
+
+// Eigene Bewertungen aus dem Camp-Snapshot übernehmen (Firebase ist die Quelle der Wahrheit).
+function applyCampRatings() {
+  if (userKey) {
+    const mine = {};
+    Object.entries(campRatings).forEach(([bandId, votes]) => {
+      const status = FROM_REMOTE[votes?.[userKey]?.status];
+      if (status) mine[bandId] = status;
+    });
+    ratings = mine;
+    writeStore(STORAGE.ratings, ratings);
+  }
+  if (activeBand) $("detail-rating-btns").innerHTML = ratingButtonsHTML(activeBand.id);
+  render();
+}
+
+// Lokale Bewertungen (vor dem ersten Namen entstanden) einmalig hochladen, falls der Name im Camp noch leer ist.
+function uploadLocalIfEmpty() {
+  if (!campDb || !userKey || !campLoaded) return;
+  const hasRemote = Object.values(campRatings).some(votes => votes?.[userKey]);
+  const local = Object.entries(ratings).filter(([, status]) => TO_REMOTE[status]);
+  if (hasRemote || !local.length) return;
+  const updates = {};
+  local.forEach(([bandId, status]) => {
+    updates[`${bandId}/${userKey}`] = { name: userName, status: TO_REMOTE[status], timestamp: Date.now() };
+  });
+  campDb.ref("ratings").update(updates).catch(error => console.warn("[Camp] Hochladen fehlgeschlagen", error));
+}
+
+function initCamp() {
+  updateUserButton();
+  try {
+    if (window.firebase) {
+      if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+      campDb = firebase.database();
+    }
+  } catch (error) {
+    console.warn("[Camp] Firebase nicht verfügbar – Bewertungen bleiben lokal", error);
+    campDb = null;
+  }
+  if (!campDb) { setSyncState(false); return; }
+
+  campDb.ref(".info/connected").on("value", snap => setSyncState(snap.val() === true));
+  campDb.ref("ratings").on("value", snap => {
+    campRatings = snap.val() || {};
+    const first = !campLoaded;
+    campLoaded = true;
+    if (first) uploadLocalIfEmpty();
+    applyCampRatings();
+  }, error => {
+    console.warn("[Camp] Lesen verweigert/fehlgeschlagen", error);
+    setSyncState(false);
+  });
+}
+
+function setRating(bandId, rate) {
+  if (!userName) { pendingRate = { bandId, rate }; openNameModal(); return; }
+  const next = ratings[bandId] === rate ? null : rate;
+  if (next) ratings[bandId] = next; else delete ratings[bandId];
+  writeStore(STORAGE.ratings, ratings);
+  if (activeBand?.id === bandId) $("detail-rating-btns").innerHTML = ratingButtonsHTML(bandId);
+  render();
+  if (!campDb) return;
+  const ref = campDb.ref(`ratings/${bandId}/${userKey}`);
+  (next ? ref.set({ name: userName, status: TO_REMOTE[next], timestamp: Date.now() }) : ref.remove())
+    .catch(error => console.warn("[Camp] Speichern fehlgeschlagen", error));
+}
+
+// Namenswechsel: Einträge vom alten auf den neuen Schlüssel umziehen, bei Konflikt gewinnt der neuere.
+async function changeUser(newName) {
+  const newKey = makeUserKey(newName);
+  const oldKey = userKey;
+  userName = newName;
+  userKey = newKey;
+  lsSet(USER_STORE.name, newName);
+  lsSet(USER_STORE.key, newKey);
+  updateUserButton();
+
+  if (campDb && campLoaded) {
+    const updates = {};
+    Object.entries(campRatings).forEach(([bandId, votes]) => {
+      const oldVote = oldKey && oldKey !== newKey ? votes?.[oldKey] : null;
+      const newVote = votes?.[newKey];
+      if (oldVote) {
+        const winner = !newVote || (oldVote.timestamp || 0) > (newVote.timestamp || 0) ? oldVote : newVote;
+        updates[`${bandId}/${newKey}`] = { ...winner, name: newName };
+        updates[`${bandId}/${oldKey}`] = null; // keine Karteileichen / Doppel-Stimmen
+      } else if (newVote && newVote.name !== newName) {
+        updates[`${bandId}/${newKey}/name`] = newName; // Schreibweise vereinheitlichen
+      }
+    });
+    try {
+      if (Object.keys(updates).length) await campDb.ref("ratings").update(updates);
+      uploadLocalIfEmpty();
+    } catch (error) {
+      console.warn("[Camp] Namenswechsel konnte nicht übertragen werden", error);
+    }
+  }
+  applyCampRatings();
+
+  if (pendingRate) {
+    const { bandId, rate } = pendingRate;
+    pendingRate = null;
+    if (ratings[bandId] !== rate) setRating(bandId, rate);
+  }
+}
+
+/* ---- Namens-Modal ---- */
+let modalReturnFocus = null;
+function openNameModal() {
+  modalReturnFocus = document.activeElement;
+  $("camp-modal").hidden = false;
+  document.body.classList.add("modal-open");
+  $("camp-name-input").value = userName;
+  $("camp-name-error").hidden = true;
+  setTimeout(() => $("camp-name-input").focus(), 30);
+}
+function closeNameModal() {
+  $("camp-modal").hidden = true;
+  document.body.classList.remove("modal-open");
+  pendingRate = null;
+  modalReturnFocus?.focus?.();
+}
+$("camp-modal-form").addEventListener("submit", async event => {
+  event.preventDefault();
+  const name = $("camp-name-input").value.trim().replace(/\s+/g, " ");
+  if (!/[a-z0-9äöüß]/.test(makeUserKey(name))) {
+    $("camp-name-error").textContent = "Bitte gib mindestens einen Buchstaben oder eine Zahl ein.";
+    $("camp-name-error").hidden = false;
+    $("camp-name-input").focus();
+    return;
+  }
+  const keepPending = pendingRate;
+  $("camp-modal").hidden = true;
+  document.body.classList.remove("modal-open");
+  pendingRate = keepPending;
+  await changeUser(name);
+  modalReturnFocus?.focus?.();
+});
+$("camp-modal-cancel").addEventListener("click", closeNameModal);
+$("camp-modal").addEventListener("click", event => { if (event.target === $("camp-modal")) closeNameModal(); });
+$("camp-user-btn").addEventListener("click", openNameModal);
+
+/* ---------------------------------------------------------
    EVENTS
    --------------------------------------------------------- */
 document.addEventListener("click", event => {
   const rateBtn = event.target.closest("[data-rate]");
   if (rateBtn) {
-    const { id, rate } = rateBtn.dataset;
-    if (ratings[id] === rate) delete ratings[id]; else ratings[id] = rate;
-    writeStore(STORAGE.ratings, ratings);
-    if (activeBand?.id === id) $("detail-rating-btns").innerHTML = ratingButtonsHTML(id);
-    render();
+    setRating(rateBtn.dataset.id, rateBtn.dataset.rate);
     return;
   }
 
@@ -1373,6 +1570,10 @@ document.addEventListener("click", event => {
 
 // Kacheln sind per Tastatur bedienbar.
 document.addEventListener("keydown", event => {
+  if (!$("camp-modal").hidden) { // Modal hat Vorrang
+    if (event.key === "Escape") closeNameModal();
+    return;
+  }
   const drawerOpen = !$("detail-drawer").classList.contains("hidden");
   if (event.key === "Escape" && drawerOpen) {
     closeDrawer();
@@ -1431,13 +1632,32 @@ $("export").addEventListener("click", () => {
         </div>`).join("")}
     </div>`;
 
+  // Camp-Voting: NUR hier erscheinen Namen ("ARCH ENEMY — 4 Stimmen (Tobias, Patty, …)")
+  const campList = BANDS
+    .map(band => ({ band, voters: campVotes(band.id).map(vote => vote.name).filter(Boolean).sort((a, b) => a.localeCompare(b, "de")) }))
+    .filter(item => item.voters.length)
+    .sort((a, b) => b.voters.length - a.voters.length || byName(a.band, b.band));
+  const campSection = !campList.length ? "" : `
+    <h2 style="margin:30px 0 0;font-size:22px;border-bottom:2px solid #1f7a42;padding-bottom:5px;text-transform:uppercase;color:#1f7a42">
+      👥 Camp-Voting (${campList.length} Bands)
+    </h2>
+    <ol style="margin:12px 0 0;padding-left:28px;font-size:16px;line-height:1.6">
+      ${campList.map(({ band, voters }) => `
+        <li style="break-inside:avoid">
+          <strong style="text-transform:uppercase">${escapeHTML(band.name)}</strong>
+          — ${voters.length} ${voters.length === 1 ? "Stimme" : "Stimmen"}
+          <span style="color:#333">(${voters.map(escapeHTML).join(", ")})</span>
+        </li>`).join("")}
+    </ol>`;
+
   const printNode = document.createElement("div");
   printNode.id = "print-section";
   printNode.style.cssText = "width:100%;font-family:'Barlow Condensed','Inter',sans-serif;color:#000;background:#fff;padding:20px";
   printNode.innerHTML = `
     <h1 style="text-align:center;margin:0 0 25px;text-transform:uppercase;font-size:36px;border-bottom:3px solid #000;padding-bottom:10px">
-      ROCKHARZ 2027 — MEIN LINE-UP
+      ROCKHARZ 2027 — ${userName ? "LINE-UP VON " + escapeHTML(userName) : "MEIN LINE-UP"}
     </h1>
+    ${campSection}
     ${section("Pflicht-Bands (Ja)", must, "#fff2e9", "#e66722", "★", "#713013")}
     ${section("Vielleicht", maybe, "#fff8e6", "#c48c34", "◉", "#54390b")}
     ${section("Restliches Line-up", rest, "#f5f5f5", "#888888", "◇", "#222")}`;
@@ -1450,3 +1670,5 @@ $("export").addEventListener("click", () => {
 /* START */
 render();
 if (window.matchMedia("(min-width: 901px)").matches && BANDS.length) openBand(BANDS[0]);
+initCamp();
+if (!userName) openNameModal(); // erster Besuch: Namen für das Camp abfragen

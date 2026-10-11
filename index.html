@@ -3,182 +3,109 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#090707">
-  <title>ROCKHARZ 2027 · Rock statt Reha</title>
+  <meta name="theme-color" content="#06090e">
+  <title>ROCKHARZ 2027 · Band Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="rockharz-theme.css?v=120">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Cinzel:wght@700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="rockharz-theme.css?v=301">
 </head>
 <body>
 
-  <!-- HERO BANNER -->
-  <header class="hero" id="top"></header>
+  <!-- HEADER: Panorama mit Vollmond-Schloss, Dämonenhirschen und Schriftzug -->
+  <header class="hero-banner-container">
+    <div class="hero-banner-wrapper">
+      <img src="assets/rockharz-banner-2027.jpg?v=301" alt="ROCKHARZ 2027 · Ballenstedt, Germany · 07.–10. Juli 2027 · Rock statt Reha" class="hero-banner-img" fetchpriority="high">
+    </div>
+  </header>
 
-  <!-- HAUPTNAVIGATION -->
-  <nav class="topnav" aria-label="Hauptnavigation">
-    <div class="topnav-inner">
-      <button class="nav-brand" id="brand-reset" title="Zurück zur Komplettansicht">
-        <span class="brand-icon-stag" aria-hidden="true"></span>
-        <span>RH<span class="orange">27</span></span>
-      </button>
+  <!-- NAVIGATION -->
+  <nav class="action-bar-container" aria-label="Hauptnavigation">
+    <div class="action-bar-inner">
 
-      <div class="nav-links">
-        <button data-page="lineup" class="active"><span>☠</span> LINE-UP</button>
-        <button data-page="favorites"><span>★</span> MEINE BANDS <b id="nav-count-favorites" class="nav-badge">0</b></button>
-        <button data-page="unrated"><span>◇</span> NOCH OFFEN <b id="nav-count-unrated" class="nav-badge">0</b></button>
-        <button data-page="schedule"><span>▦</span> RUNNING ORDER</button>
+      <div class="nav-tabs">
+        <button type="button" class="nav-tab active" data-page="lineup">LINE-UP</button>
+        <button type="button" class="nav-tab" data-page="favorites">FAVORITEN ★ <span class="tab-count">(<span id="nav-count-favorites">0</span>)</span></button>
+        <button type="button" class="nav-tab" data-page="unrated">UNBEWERTET ◉ <span class="tab-count">(<span id="nav-count-unrated">0</span>)</span></button>
       </div>
 
-      <div class="nav-tools">
-        <!-- DER NEUE OFFLINE-PDF DRUCKEN BUTTON -->
-        <button id="export" title="Deine Bandauswahl als PDF für's Handy speichern">🖨️ <span>OFFLINE PDF</span></button>
+      <div class="action-bar-right">
+        <button type="button" class="export-pdf-btn" id="export" title="Line-Up als PDF drucken">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5M4 20h16"/></svg>
+          EXPORT PDF
+        </button>
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#c4cfdc" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l5 5"/></svg>
+          <input type="search" id="search" placeholder="Bands suchen ..." aria-label="Bands suchen" autocomplete="off">
+          <button type="button" id="reset-view-btn" class="hidden" title="Suche leeren" aria-label="Suche leeren">✕</button>
+        </div>
       </div>
     </div>
   </nav>
 
-  <!-- FESTIVALTAGE -->
-  <section class="festival-days" aria-label="Festivaltage filtern">
-    <div class="festival-days-inner">
-      <button class="festival-day festival-day-wednesday" data-day-filter="2027-07-07" title="Nach Mittwoch filtern">
-        <span class="day-symbol"></span>
-        <div class="day-text">
-          <strong>MITTWOCH</strong>
-          <small>07. JULI · METAL MITTWOCH</small>
-        </div>
-      </button>
-      <button class="festival-day festival-day-thursday" data-day-filter="2027-07-08" title="Nach Donnerstag filtern">
-        <span class="day-symbol"></span>
-        <div class="day-text">
-          <strong>DONNERSTAG</strong>
-          <small>08. JULI</small>
-        </div>
-      </button>
-      <button class="festival-day festival-day-friday" data-day-filter="2027-07-09" title="Nach Freitag filtern">
-        <span class="day-symbol"></span>
-        <div class="day-text">
-          <strong>FREITAG</strong>
-          <small>09. JULI</small>
-        </div>
-      </button>
-      <button class="festival-day festival-day-saturday" data-day-filter="2027-07-10" title="Nach Samstag filtern">
-        <span class="day-symbol"></span>
-        <div class="day-text">
-          <strong>SAMSTAG</strong>
-          <small>10. JULI</small>
-        </div>
-      </button>
-    </div>
-  </section>
-
-  <!-- 2-SPALTIGES DESKTOP-LAYOUT / APP-FLOW MOBILE -->
+  <!-- HAUPT-DASHBOARD -->
   <div class="rh-layout-wrapper">
 
-    <!-- LINKE SPALTE: BANDS & INHALT -->
     <main class="rh-main-content">
-
-      <!-- SEITE: LINE-UP -->
       <section id="page-lineup" class="page">
-        <div class="heading-row">
-          <div class="heading-text">
-            <h2 id="main-heading">DAS <em>LINE-UP</em></h2>
-            <p id="lineup-subtitle">BANDS · DEINE PERSÖNLICHE FESTIVALPLANUNG</p>
-          </div>
-
-          <div class="toolbar-inline">
-            <button id="reset-view-btn" class="day-reset-btn hidden" title="Filter aufheben">✕ Filter zurücksetzen</button>
-            <label class="search">
-              <span class="search-icon">⌕</span>
-              <input id="search" type="search" placeholder="Band suchen..." autocomplete="off">
-            </label>
-          </div>
-        </div>
-
         <div id="band-grid" class="band-grid-concept"></div>
       </section>
 
-      <!-- SEITE: MEINE BANDS -->
       <section id="page-favorites" class="page hidden">
-        <div class="heading-row">
-          <div class="heading-text">
-            <h2>MEINE <em>BANDS</em></h2>
-            <p>Deine persönliche Auswahl (Ja & Vielleicht).</p>
-          </div>
-        </div>
+        <div class="heading-row"><h2>MEINE <em>FAVORITEN</em></h2></div>
         <div id="mine-grid" class="band-grid-concept"></div>
       </section>
 
-      <!-- SEITE: NOCH OFFEN -->
       <section id="page-unrated" class="page hidden">
-        <div class="heading-row">
-          <div class="heading-text">
-            <h2>NOCH <em>OFFEN</em></h2>
-            <p>Bands, die du bisher noch nicht bewertet hast.</p>
-          </div>
-        </div>
+        <div class="heading-row"><h2>NOCH <em>UNBEWERTET</em></h2></div>
         <div id="unrated-grid" class="band-grid-concept"></div>
-      </section>
-
-      <!-- SEITE: RUNNING ORDER -->
-      <section id="page-schedule" class="page hidden">
-        <div class="heading-row">
-          <div class="heading-text">
-            <h2>RUNNING <em>ORDER</em></h2>
-            <p>Offizielle Spielzeiten folgen nach Bestätigung.</p>
-          </div>
-        </div>
-        <div id="schedule" class="schedule"></div>
       </section>
     </main>
 
     <!-- MOBILE BACKDROP -->
     <div id="drawer-backdrop" class="drawer-backdrop hidden"></div>
 
-    <!-- RECHTE SPALTE: DETAIL-PANEL & PLAYER -->
-    <aside class="band-detail-drawer" id="detail-drawer">
-      <div class="drawer-handle" aria-hidden="true"></div>
-      <button class="drawer-close" id="drawer-close-btn" aria-label="Schließen">✕</button>
-      
-      <div class="drawer-header-art">
-        <img id="detail-img" src="assets/stag-skull-clean.png" alt="Band Foto" style="object-fit: cover;">
-        <h2 id="detail-title">LÄDT...</h2>
+    <!-- RECHTER PLAYER -->
+    <aside class="band-detail-drawer hidden" id="detail-drawer" aria-labelledby="detail-title">
+      <span class="player-frame" aria-hidden="true"></span>
+
+      <button type="button" class="drawer-close" id="drawer-close-btn" aria-label="Schließen">✕</button>
+
+      <div class="drawer-scroll">
+        <div class="drawer-header-art">
+          <div class="drawer-art-wrap" id="detail-art-wrap">
+            <img id="detail-img" src="" alt="" class="hidden" referrerpolicy="no-referrer">
+            <div class="stag-relief-fallback" id="detail-fallback" aria-hidden="true"></div>
+          </div>
+        </div>
+
+        <div class="drawer-content">
+          <h2 id="detail-title">LÄDT …</h2>
+          <div class="drawer-meta-line" id="detail-meta"></div>
+
+          <p id="detail-desc" class="concept-desc"></p>
+
+          <div class="drawer-section-title">TRACKLIST (HÖRPROBEN)</div>
+          <div class="drawer-songs-list" id="detail-songs"></div>
+
+          <div class="drawer-ratings-block" id="detail-rating-btns" role="group" aria-label="Deine Festival-Wertung"></div>
+        </div>
       </div>
 
-      <div class="drawer-content">
-        <div class="drawer-meta-line">
-          <span class="drawer-genre" id="detail-genre">...</span>
-          <a href="#" target="_blank" rel="noopener" class="drawer-website-btn" id="detail-website">
-            Band-Website ↗
-          </a>
+      <!-- Footer außerhalb des Scrollbereichs: immer sichtbar -->
+      <div class="drawer-volume-section">
+        <div class="volume-slider-row">
+          <svg class="vol-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor" fill-opacity=".25"/><path d="M16.5 8.5a5 5 0 010 7M19 6a8.5 8.5 0 010 12"/></svg>
+          <input type="range" id="master-volume" min="0" max="1" step="0.02" value="0.52" aria-label="Master-Lautstärke">
+          <output class="vol-percent" id="volume-value" for="master-volume">52%</output>
         </div>
-
-        <div class="drawer-desc-block">
-          <p id="detail-desc" class="desc-collapsed"></p>
-          <button id="desc-expand-btn" class="desc-expand-link">Mehr anzeigen ∨</button>
-        </div>
-
-        <div class="drawer-section-title">DEINE WERTUNG</div>
-        <div class="drawer-ratings-block" id="detail-rating-btns"></div>
-
-        <div class="drawer-section-title sound-check-title" style="display: flex; align-items: center; margin-top: 20px;">
-          <div style="flex: 1;">
-            <span>♫ SOUND CHECK</span>
-            <small style="margin-left: 6px; color: var(--rh-muted);">TOP 3</small>
-          </div>
-          <!-- LAUTSTÄRKEREGLER -->
-          <div class="volume-control" title="Master Lautstärke">
-            <span aria-hidden="true" style="font-size: 13px;">🔈</span>
-            <input type="range" id="master-volume" min="0" max="1" step="0.02" value="0.5" aria-label="Lautstärke ändern">
-            <span aria-hidden="true" style="font-size: 13px;">🔊</span>
-          </div>
-        </div>
-        <div class="drawer-songs-list" id="detail-songs"></div>
       </div>
     </aside>
 
   </div>
 
-  <script src="bands.js?v=120"></script>
-  <script src="app.js?v=120"></script>
+  <audio id="preview-audio" preload="none"></audio>
+  <script src="bands.js?v=301"></script>
+  <script src="app.js?v=301"></script>
 </body>
 </html>

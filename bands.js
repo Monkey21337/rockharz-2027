@@ -179,6 +179,62 @@ const BAND_DATA = [
     desc: "Wiener Punkrock mit Schmäh und Vollgas.",
     songs: ["Arbeitslos", "King of Simmering", "Fuaßboiplotz"],
     day: null
+  },
+
+  /* BANDWELLE 2 (bestätigt Oktober 2026) */
+  {
+    name: "Jinjer", genre: "Progressive Metal", website: "https://jinjer-metal.com",
+    desc: "Ukrainische Groove- und Prog-Metal-Wucht um Tatiana Shmayluk – brutale Growls und klarer Gesang in einem Atemzug.",
+    songs: ["Pisces", "Perennial", "Judgement (& Punishment)"],
+    day: null
+  },
+  {
+    name: "Beast in Black", genre: "Heavy Metal", website: "https://beastinblack.com",
+    desc: "Finnischer Heavy Metal mit 80er-Synthies, Disco-Groove und den Falsett-Höhenflügen von Yannis Papadopoulos.",
+    songs: ["Blind and Frozen", "Sweet True Lies", "One Night in Tokyo"],
+    day: null
+  },
+  {
+    name: "Fear Factory", genre: "Industrial Metal", website: "https://fearfactory.com",
+    desc: "Pioniere des Industrial Metal aus Los Angeles: maschinenhafte Riffs, Stakkato-Drums und Visionen von Mensch gegen Maschine.",
+    songs: ["Replica", "Edgecrusher", "Linchpin"],
+    day: null
+  },
+  {
+    name: "Burning Witches", genre: "Heavy / Power Metal", website: "",
+    desc: "Schweizer Heavy-Metal-Hexen aus Brugg mit klassischen Riffs, Doppel-Leads und hymnischen Refrains.",
+    songs: ["Dance with the Devil", "The Witch of the North", "Unleash the Beast"],
+    day: null
+  },
+  {
+    name: "Myrath", genre: "Oriental Prog Metal", website: "https://myrath.com",
+    desc: "Progressive Metal aus Tunesien, der orientalische Melodien und Instrumente mit gewaltigen Power-Metal-Refrains verbindet.",
+    songs: ["Believer", "Merciless Times", "Endure the Silence"],
+    day: null
+  },
+  {
+    name: "Elvenking", genre: "Folk Power Metal", website: "https://elvenking.net",
+    desc: "Italienischer Folk Power Metal mit Geige, Mitsing-Hymnen und märchenhaft-düsteren Geschichten.",
+    songs: ["Pagan Revolution", "Elvenlegions", "Silverseal"],
+    day: null
+  },
+  {
+    name: "Motörizer", genre: "Rock'n'Roll / Heavy Metal", website: "",
+    desc: "Laut, dreckig, kompromisslos: Rock'n'Roll und Heavy Metal ganz im Geiste von Lemmy.",
+    songs: ["Seduction Is a Sin", "Motor City 5", "Iron Fist"],
+    day: null
+  },
+  {
+    name: "Mixed Up Everything", genre: "Alternative Rock", website: "",
+    desc: "Vier Brüder aus Melbourne mit energiegeladenem Rock, eingängigen Hooks und Mitgröl-Refrains.",
+    songs: ["Having Fun", "In Your Shoes", "Better Off (Without You)"],
+    day: null
+  },
+  {
+    name: "Vulvarine", genre: "Hard Rock", website: "",
+    desc: "Wiener Frauen-Rockband mit dreckigen Riffs, Sleaze-Attitüde und Ohrwurm-Refrains.",
+    songs: ["Good Time", "Rock Bottom", "Equal, Not the Same"],
+    day: null
   }
 ];
 
@@ -193,7 +249,10 @@ const ORIGINS = {
   "Lord of the Lost": "Deutschland", "Marduk": "Schweden", "Metal Church": "USA",
   "Nestor": "Schweden", "Setyøursails": "Deutschland", "SKÁLD": "Frankreich",
   "Storm Seeker": "Deutschland", "Tankard": "Deutschland",
-  "The Sisters of Mercy": "Großbritannien", "Turbobier": "Österreich"
+  "The Sisters of Mercy": "Großbritannien", "Turbobier": "Österreich",
+  "Jinjer": "Ukraine", "Beast in Black": "Finnland", "Fear Factory": "USA",
+  "Burning Witches": "Schweiz", "Myrath": "Tunesien", "Elvenking": "Italien",
+  "Mixed Up Everything": "Australien", "Vulvarine": "Österreich"
 };
 
 // ø/å/æ/ß zerfallen bei normalize() nicht – vorher ersetzen ("Setyøursails" -> "setyoursails")
@@ -214,4 +273,4 @@ const BANDS = BAND_DATA.map(item => ({
   description: item.desc,
   songs: item.songs.map(title => ({ title })),
   day: item.day || null
-}));
+})).sort((a, b) => a.name.localeCompare(b.name, "de", { sensitivity: "base" })); // Raster immer alphabetisch, egal in welcher Bandwelle eingetragen

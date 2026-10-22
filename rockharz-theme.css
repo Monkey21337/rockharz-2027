@@ -521,6 +521,47 @@ button { cursor: pointer; touch-action: manipulation; }
   pointer-events: none;
 }
 .camp-count-badge[hidden] { display: none; }
+/* Zähler ist anfassbar: Hover/Antippen zeigt, wer die Band sehen will */
+.camp-count-badge { pointer-events: auto; cursor: pointer; position: relative; transition: border-color 0.15s, color 0.15s; }
+.camp-count-badge::after { content: ""; position: absolute; inset: -8px; } /* größere Trefferfläche für Finger */
+.camp-count-badge:hover, .camp-count-badge[aria-expanded="true"] { border-color: #e4bc70; color: #fff; }
+
+.camp-popover {
+  position: fixed;
+  z-index: 250;
+  min-width: 190px;
+  max-width: min(280px, calc(100vw - 16px));
+  max-height: min(50vh, 340px);
+  overflow-y: auto;
+  padding: 12px 16px 10px;
+  background: linear-gradient(180deg, #16223a 0%, #0a1018 100%);
+  border: 1px solid rgba(197, 155, 72, 0.8);
+  border-radius: 4px;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  color: #e8edf4;
+  font-family: var(--rh-ui);
+  animation: rh-pop-in 0.14s ease-out;
+}
+.camp-popover[hidden] { display: none; }
+@keyframes rh-pop-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+.camp-popover-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #2a3a52;
+  font-family: var(--rh-display);
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  line-height: 1.3;
+  color: var(--rh-gold);
+}
+.camp-popover-title svg { width: 16px; height: 16px; flex: none; fill: none; stroke: var(--rh-gold); stroke-width: 2; stroke-linecap: round; }
+.camp-popover ul { margin: 0; padding: 0; list-style: none; }
+.camp-popover li { padding: 3px 0; font-size: 17px; font-weight: 500; line-height: 1.35; overflow-wrap: anywhere; }
+.camp-popover li em { font-style: normal; font-size: 14px; color: var(--rh-muted); }
 .camp-count-badge svg { width: 15px; height: 15px; flex: none; fill: none; stroke: var(--rh-gold); stroke-width: 2; stroke-linecap: round; }
 .card-camp-count { position: absolute; z-index: 5; top: 14px; right: 16px; }
 

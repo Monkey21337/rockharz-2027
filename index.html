@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Cinzel:wght@700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="rockharz-theme.css?v=305">
+  <link rel="stylesheet" href="rockharz-theme.css?v=306">
 </head>
 <body>
 
@@ -16,8 +16,8 @@
   <header class="hero-banner-container">
     <div class="hero-banner-wrapper">
       <picture>
-        <source media="(max-width: 600px)" srcset="assets/banner-mobile-2027.jpg?v=303">
-        <img src="assets/banner-desktop-2027.jpg?v=303" alt="ROCKHARZ 2027 · Ballenstedt, Germany · 07.–10. Juli 2027 · Rock statt Reha" class="hero-banner-img" fetchpriority="high">
+        <source media="(max-width: 600px)" srcset="assets/banner-mobile-2027.jpg?v=306">
+        <img src="assets/banner-desktop-2027.jpg?v=306" alt="ROCKHARZ 2027 · Ballenstedt, Germany · 07.–10. Juli 2027 · Rock statt Reha" class="hero-banner-img" fetchpriority="high">
       </picture>
     </div>
   </header>
@@ -85,7 +85,7 @@
             <div class="stag-relief-fallback" id="detail-fallback" aria-hidden="true"></div>
           </div>
           <!-- Camp-Zähler: nur Symbol + Zahl, keine Namen -->
-          <div class="camp-count-badge drawer-camp-count" id="detail-camp-count" role="status" hidden></div>
+          <button type="button" class="camp-count-badge drawer-camp-count" id="detail-camp-count" aria-controls="camp-popover" aria-expanded="false" hidden></button>
           <!-- Vor/Zurück (mobil sichtbar; zusätzlich Wischen und Pfeiltasten) -->
           <button type="button" class="drawer-step prev" id="drawer-prev" data-step="-1" aria-label="Vorherige Band">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
@@ -123,6 +123,9 @@
 
   </div>
 
+  <!-- Wer will die Band sehen? Erscheint beim Hover/Antippen des Camp-Zählers -->
+  <div class="camp-popover" id="camp-popover" role="tooltip" hidden></div>
+
   <!-- CAMP-NAME: einmal festlegen, auf Handy und PC denselben Namen nutzen -->
   <div class="camp-modal-backdrop" id="camp-modal" hidden>
     <form class="camp-modal" id="camp-modal-form" role="dialog" aria-modal="true" aria-labelledby="camp-modal-title" aria-describedby="camp-modal-hint" novalidate>
@@ -143,7 +146,7 @@
   <!-- Firebase (Compat-CDN, ohne Build-Tools); fällt bei Blockade sauber auf lokales Speichern zurück -->
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
-  <script src="bands.js?v=304"></script>
-  <script src="app.js?v=304"></script>
+  <script src="bands.js?v=306"></script>
+  <script src="app.js?v=306"></script>
 </body>
 </html>

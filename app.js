@@ -1201,6 +1201,7 @@ function render() {
 
   loadCardPhotos();
   if (activeBand) { updateStepButtons(); updateDetailCampCount(); }
+  refreshCampPopover();
 }
 
 function ratingButtonsHTML(id) {
@@ -1372,18 +1373,96 @@ let pendingRate = null;    // Bewertung, die vor dem Namen geklickt wurde
 const campVotes = bandId => Object.values(campRatings[bandId] || {}).filter(vote => vote && vote.status === "favorite");
 const peopleIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 19c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"/><circle cx="17" cy="9" r="2.6"/><path d="M15.5 13.7c.5-.1 1-.2 1.5-.2 2.6 0 4.5 1.8 4.5 4.6"/></svg>';
 
+const wantVerb = count => (count === 1 ? "will" : "wollen");
+
+// Wer will die Band sehen? Sortiert, eigener Eintrag markiert.
+const campVoters = bandId => Object.entries(campRatings[bandId] || {})
+  .filter(([, vote]) => vote && vote.status === "favorite")
+  .map(([key, vote]) => ({ key, name: vote.name || key }))
+  .sort((a, b) => a.name.localeCompare(b.name, "de", { sensitivity: "base" }));
+
 function campCountBadgeHTML(bandId) {
   const count = campVotes(bandId).length;
   if (!count) return "";
-  return `<span class="camp-count-badge card-camp-count" aria-label="${count} aus dem Camp ${count === 1 ? "will" : "wollen"} die Band sehen">${peopleIcon}${count}</span>`;
+  return `<span class="camp-count-badge card-camp-count" data-camp-band="${bandId}" aria-label="${count} aus dem Camp ${wantVerb(count)} die Band sehen">${peopleIcon}${count}</span>`;
 }
 
 function updateDetailCampCount() {
   const badge = $("detail-camp-count");
   const count = activeBand ? campVotes(activeBand.id).length : 0;
   badge.hidden = !count;
-  if (count) badge.innerHTML = `${peopleIcon}<span>${count} ${count === 1 ? "will" : "wollen"} die Band sehen</span>`;
+  if (!count) return;
+  badge.dataset.campBand = activeBand.id;
+  badge.innerHTML = `${peopleIcon}<span>${count} ${wantVerb(count)} die Band sehen</span>`;
+  badge.setAttribute("aria-label", `${count} ${wantVerb(count)} die Band sehen – Namen anzeigen`);
 }
+
+/* ---- Namen-Popover am Zähler: Maus = Hover, Touch/Tastatur = Antippen ---- */
+let campPopover = null; // { bandId, inDrawer, pinned }
+
+function campBadgeFor(state) {
+  return state.inDrawer
+    ? (!$("detail-camp-count").hidden && $("detail-camp-count").dataset.campBand === state.bandId ? $("detail-camp-count") : null)
+    : document.querySelector(`.page:not(.hidden) .card-camp-count[data-camp-band="${state.bandId}"]`);
+}
+
+function showCampPopover(badge, pinned) {
+  const bandId = badge.dataset.campBand;
+  const voters = campVoters(bandId);
+  if (!voters.length) { hideCampPopover(); return; }
+  const band = BANDS.find(item => item.id === bandId);
+  const pop = $("camp-popover");
+  pop.innerHTML = `
+    <div class="camp-popover-title">${peopleIcon}<span>${voters.length} ${wantVerb(voters.length)} ${escapeHTML(band?.name || "")} sehen</span></div>
+    <ul>${voters.map(voter => `<li>${escapeHTML(voter.name)}${voter.key === userKey ? " <em>(du)</em>" : ""}</li>`).join("")}</ul>`;
+  document.querySelectorAll(".camp-count-badge[aria-expanded]").forEach(el => el.setAttribute("aria-expanded", "false"));
+  if (badge.id === "detail-camp-count") badge.setAttribute("aria-expanded", "true");
+  campPopover = { bandId, inDrawer: badge.id === "detail-camp-count", pinned };
+
+  // unter dem Zähler, rechtsbündig (Kachel) bzw. linksbündig (Player); oben, wenn unten kein Platz ist
+  pop.hidden = false;
+  pop.style.left = "0px";
+  pop.style.top = "0px";
+  const r = badge.getBoundingClientRect();
+  const w = pop.offsetWidth;
+  const h = pop.offsetHeight;
+  const m = 8;
+  let left = campPopover.inDrawer ? r.left : r.right - w;
+  left = Math.min(Math.max(m, left), window.innerWidth - w - m);
+  let top = r.bottom + 8;
+  if (top + h > window.innerHeight - m) top = Math.max(m, r.top - h - 8);
+  pop.style.left = Math.round(left) + "px";
+  pop.style.top = Math.round(top) + "px";
+}
+
+function hideCampPopover() {
+  if (!campPopover) return;
+  campPopover = null;
+  $("camp-popover").hidden = true;
+  document.querySelectorAll(".camp-count-badge[aria-expanded]").forEach(el => el.setAttribute("aria-expanded", "false"));
+}
+
+// Nach jedem Rendern (z. B. neue Stimme live): offenes Popover mit frischen Namen neu aufbauen
+function refreshCampPopover() {
+  if (!campPopover) return;
+  const badge = campBadgeFor(campPopover);
+  if (badge) showCampPopover(badge, campPopover.pinned); else hideCampPopover();
+}
+
+document.addEventListener("pointerover", event => {
+  if (event.pointerType !== "mouse") return;
+  const badge = event.target.closest(".camp-count-badge");
+  if (badge && campPopover?.bandId !== badge.dataset.campBand) showCampPopover(badge, false);
+});
+document.addEventListener("pointerout", event => {
+  if (event.pointerType !== "mouse" || !campPopover || campPopover.pinned) return;
+  if (!event.target.closest(".camp-count-badge, #camp-popover")) return;
+  if (event.relatedTarget?.closest?.(".camp-count-badge, #camp-popover")) return;
+  hideCampPopover();
+});
+// Scrollen/Größenänderung: Popover würde sonst in der Luft hängen
+document.addEventListener("scroll", event => { if (!event.target.closest?.("#camp-popover")) hideCampPopover(); }, true);
+window.addEventListener("resize", hideCampPopover);
 
 function updateUserButton() {
   $("camp-user-name").textContent = userName || "Name festlegen";
@@ -1543,6 +1622,16 @@ $("camp-user-btn").addEventListener("click", openNameModal);
    EVENTS
    --------------------------------------------------------- */
 document.addEventListener("click", event => {
+  // Zähler antippen: Namen ein-/ausblenden – öffnet NICHT die Band
+  const campBadge = event.target.closest(".camp-count-badge");
+  if (campBadge) {
+    event.preventDefault();
+    if (campPopover?.pinned && campPopover.bandId === campBadge.dataset.campBand) hideCampPopover();
+    else showCampPopover(campBadge, true);
+    return;
+  }
+  if (campPopover && !event.target.closest("#camp-popover")) hideCampPopover();
+
   const rateBtn = event.target.closest("[data-rate]");
   if (rateBtn) {
     setRating(rateBtn.dataset.id, rateBtn.dataset.rate);
@@ -1570,6 +1659,7 @@ document.addEventListener("click", event => {
 
 // Kacheln sind per Tastatur bedienbar.
 document.addEventListener("keydown", event => {
+  if (event.key === "Escape" && campPopover) { hideCampPopover(); return; }
   if (!$("camp-modal").hidden) { // Modal hat Vorrang
     if (event.key === "Escape") closeNameModal();
     return;

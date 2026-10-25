@@ -147,7 +147,7 @@ const BAND_DATA = [
   {
     name: "Setyøursails", genre: "Metalcore", website: "https://setyoursails.net",
     desc: "Moderner, energiegeladener Metalcore aus Köln mit wütenden Shouts und fetten Breakdowns.",
-    songs: ["Bad Company", "Ghost", "Mirror"],
+    songs: ["Bad Company", "Ghosts", "Mirror"],
     day: null
   },
   {
@@ -177,7 +177,7 @@ const BAND_DATA = [
   {
     name: "Turbobier", genre: "Punk Rock", website: "https://turbobier.at",
     desc: "Wiener Punkrock mit Schmäh und Vollgas.",
-    songs: ["Arbeitslos", "King of Simmering", "Fuaßboiplotz"],
+    songs: ["Arbeitslos durch den Tag", "King of Simmering", "Fuaßboiplotz"],
     day: null
   },
 

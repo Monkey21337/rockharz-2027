@@ -123,6 +123,20 @@ const WIKI_ONLY = {
   "dust bolt": [["Dust_Bolt", "en"], ["Dust_Bolt", "de"]]
 };
 
+// Feste Deezer-Künstler-IDs (bandId -> ID): Namen wie "Equilibrium" gibt es bei Deezer mehrfach.
+// Ermittelt über den Katalog: Bei genau diesem Künstler stehen unsere Songs. Neue Band = neue Zeile.
+const DEEZER_ARTIST_IDS = {
+  "accept": 5761, "alestorm": 125436, "all-for-metal": 178819777, "arch-enemy": 1392,
+  "beast-in-black": 13130131, "bruce-dickinson": 1779, "burning-witches": 12466006, "coppelius": 472675,
+  "d-artagnan": 9617580, "dust-bolt": 513441, "eisbrecher": 5579, "elvenking": 16621, "emil-bulls": 80771,
+  "equilibrium": 113493, "fear-factory": 2985, "grave-digger": 3798, "gutalax": 1346242, "gwar": 13096,
+  "h-blockx": 3687, "handgemeng": 14936701, "igel-vs-shark": 69120892, "jinjer": 2544561,
+  "katerfahrt": 232170105, "korpiklaani": 8544, "lord-of-the-lost": 309541, "marduk": 7390,
+  "metal-church": 266681, "mixed-up-everything": 74960722, "motorizer": 50749462, "myrath": 246392,
+  "nestor": 250800332, "setyoursails": 52265132, "skald": 49005051, "storm-seeker": 10201188, "tankard": 7114,
+  "the-sisters-of-mercy": 2482, "turbobier": 7699372, "vulvarine": 98621872
+};
+
 // Logos, Albumcover und Deezers leere Platzhalter-Bilder sind keine Promofotos.
 const NON_PHOTO = /(logo|wordmark|album|cover|artwork|\.svg)/i;
 function isPromoPhotoUrl(url) {
@@ -137,7 +151,8 @@ function isPromoPhotoUrl(url) {
    Ist ein Eintrag älter, wird neu geladen; scheitert das (Funkloch), gilt weiter der alte Stand. */
 const OFFLINE = {
   wiki: "rockharz2027_wiki_cache_v1",     // Anfrage-URL -> { at, json }
-  photos: "rockharz2027_photo_cache_v1",  // bandId -> { at, url, data }  (data = verkleinerte JPEG-Kopie)
+  photos: "rockharz2027_photo_cache_v2",  // bandId -> { at, url, data }  (data = verkleinerte JPEG-Kopie)
+                                          // v2: v1 enthielt Fotos falscher Namensvettern (z. B. Equilibrium)
   ttl: 14 * 24 * 60 * 60 * 1000,
   keep: 90 * 24 * 60 * 60 * 1000,         // danach endgültig verwerfen
   photoSize: 560
@@ -146,6 +161,7 @@ const isFresh = entry => Boolean(entry) && Date.now() - entry.at < OFFLINE.ttl;
 const pruneOld = store => Object.fromEntries(Object.entries(store || {}).filter(([, e]) => e && Date.now() - e.at < OFFLINE.keep));
 let wikiStore = pruneOld(readStore(OFFLINE.wiki, {}));
 let photoStore = pruneOld(readStore(OFFLINE.photos, {}));
+try { localStorage.removeItem("rockharz2027_photo_cache_v1"); } catch {}
 
 // Bei vollem Speicher die ältesten Bildkopien opfern, die URLs bleiben erhalten.
 function saveOffline(key, store) {
@@ -244,6 +260,11 @@ async function fetchWikiSearchImage(band, lang) {
 }
 
 async function fetchDeezerArtistPhoto(band) {
+  const knownId = DEEZER_ARTIST_IDS[band.id];
+  if (knownId) {
+    const artist = await catalogueJSONP(`https://api.deezer.com/artist/${knownId}`, { output: "jsonp" });
+    return [artist?.picture_xl, artist?.picture_big].find(isPromoPhotoUrl) || null;
+  }
   const data = await catalogueJSONP("https://api.deezer.com/search/artist", {
     q: band.name, output: "jsonp", limit: 5
   });
@@ -759,6 +780,12 @@ function considerFallback(ctx, tracks, label) {
 }
 
 async function deezerTopTracks(ctx) {
+  const knownId = DEEZER_ARTIST_IDS[ctx.band.id];
+  if (knownId) {
+    ctx.trace.add("Deezer Künstler", `feste ID ${knownId}`);
+    return queryProvider(ctx, "Deezer", "Deezer Top-Tracks", `https://api.deezer.com/artist/${knownId}/top`,
+      { output: "jsonp", limit: 25 }, deezerExtract);
+  }
   for (const name of uniq([ctx.band.name, ctx.foldPairs[0]?.name, ctx.foldPairs[2]?.name]).slice(0, 2)) {
     const artists = await queryProvider(ctx, "Deezer", "Deezer Künstlersuche", "https://api.deezer.com/search/artist",
       { q: name, output: "jsonp", limit: 5 },
@@ -1357,6 +1384,7 @@ function openBand(band) {
   const img = $("detail-img");
   const fallback = $("detail-fallback");
   img.alt = band.name;
+  img.dataset.band = band.id; // für bandspezifische Bildausschnitte im CSS
   const cached = photoCache.get(band.id);
   img.removeAttribute("src");
   applyPhoto(img, fallback, cached || null);

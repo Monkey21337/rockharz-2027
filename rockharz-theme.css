@@ -1628,3 +1628,10 @@ html.crew-unlocking .crew-lock { opacity: 0; visibility: hidden; }
   color: #6f8098;
 }
 @media print { .rh-footer, .crew-lock { display: none !important; } }
+
+/* =========================================================
+   10. BILDAUSSCHNITT PRO BAND
+   Wenn die Musiker auf einem Foto weit unten stehen, den Ausschnitt nach unten schieben.
+   ========================================================= */
+.concept-card-img-wrap img[data-img-band-id="equilibrium"] { object-position: center 70%; }
+#detail-img[data-band="equilibrium"] { object-position: center 62%; }

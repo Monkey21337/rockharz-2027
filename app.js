@@ -133,17 +133,95 @@ function isPromoPhotoUrl(url) {
   return !NON_PHOTO.test(file);
 }
 
-async function fetchWikiImage(title, lang = "en") {
+/* ---- Offline-Cache (localStorage): Wikipedia-Antworten und Bandfotos, 14 Tage frisch ----
+   Ist ein Eintrag älter, wird neu geladen; scheitert das (Funkloch), gilt weiter der alte Stand. */
+const OFFLINE = {
+  wiki: "rockharz2027_wiki_cache_v1",     // Anfrage-URL -> { at, json }
+  photos: "rockharz2027_photo_cache_v1",  // bandId -> { at, url, data }  (data = verkleinerte JPEG-Kopie)
+  ttl: 14 * 24 * 60 * 60 * 1000,
+  keep: 90 * 24 * 60 * 60 * 1000,         // danach endgültig verwerfen
+  photoSize: 560
+};
+const isFresh = entry => Boolean(entry) && Date.now() - entry.at < OFFLINE.ttl;
+const pruneOld = store => Object.fromEntries(Object.entries(store || {}).filter(([, e]) => e && Date.now() - e.at < OFFLINE.keep));
+let wikiStore = pruneOld(readStore(OFFLINE.wiki, {}));
+let photoStore = pruneOld(readStore(OFFLINE.photos, {}));
+
+// Bei vollem Speicher die ältesten Bildkopien opfern, die URLs bleiben erhalten.
+function saveOffline(key, store) {
+  for (;;) {
+    try { localStorage.setItem(key, JSON.stringify(store)); return; }
+    catch {
+      const oldest = Object.values(photoStore).filter(e => e.data).sort((a, b) => a.at - b.at)[0];
+      if (!oldest) return;
+      oldest.data = null;
+      if (store !== photoStore) { try { localStorage.setItem(OFFLINE.photos, JSON.stringify(photoStore)); } catch {} }
+    }
+  }
+}
+
+// Nur die Felder behalten, die die App nutzt (Bild + Text), damit der Speicher reicht.
+const slimWiki = json => json?.query
+  ? { query: { pages: Object.fromEntries(Object.entries(json.query.pages || {}).map(([k, p]) => [k, { title: p.title, index: p.index, original: p.original }])) } }
+  : { type: json?.type, title: json?.title, description: json?.description, extract: json?.extract, thumbnail: json?.thumbnail, originalimage: json?.originalimage };
+
+async function wikiJSON(url) {
+  const hit = wikiStore[url];
+  if (isFresh(hit)) return hit.json;
   try {
-    const res = await fetch(
-      `https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`,
-      { referrerPolicy: "no-referrer", signal: AbortSignal.timeout(5000) }
-    );
-    if (!res.ok) return null;
-    const data = await res.json();
-    const url = data.originalimage?.source || data.thumbnail?.source || null;
-    return isPromoPhotoUrl(url) ? url : null;
-  } catch { return null; }
+    const res = await fetch(url, { referrerPolicy: "no-referrer", signal: AbortSignal.timeout(5000) });
+    if (!res.ok) {
+      if (res.status !== 404) return hit?.json ?? null; // Drosselung o. Ä.: alten Stand nutzen
+      wikiStore[url] = { at: Date.now(), json: null };
+    } else {
+      wikiStore[url] = { at: Date.now(), json: slimWiki(await res.json()) };
+    }
+    saveOffline(OFFLINE.wiki, wikiStore);
+    return wikiStore[url].json;
+  } catch {
+    return hit?.json ?? null; // offline
+  }
+}
+
+// Wikimedia-Original -> 500-px-Vorschau (Standardgröße), spart Datenvolumen beim Speichern
+const wikimediaThumb = url => {
+  const m = /^(https:\/\/upload\.wikimedia\.org\/wikipedia\/[^/]+)\/(\w\/\w\w)\/([^/?]+)$/.exec(url.split("?")[0]);
+  return m ? `${m[1]}/thumb/${m[2]}/${m[3]}/500px-${m[3]}` : null;
+};
+
+function photoToData(url) {
+  return new Promise(resolve => {
+    const image = new Image();
+    image.crossOrigin = "anonymous";
+    image.referrerPolicy = "no-referrer";
+    const timer = setTimeout(() => resolve(null), 10000);
+    image.onload = () => {
+      clearTimeout(timer);
+      try {
+        const scale = Math.min(1, OFFLINE.photoSize / Math.max(image.naturalWidth, image.naturalHeight));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(image.naturalWidth * scale);
+        canvas.height = Math.round(image.naturalHeight * scale);
+        canvas.getContext("2d").drawImage(image, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL("image/jpeg", 0.72));
+      } catch { resolve(null); } // ohne CORS-Freigabe bleibt nur die URL im Cache
+    };
+    image.onerror = () => { clearTimeout(timer); resolve(null); };
+    image.src = url;
+  });
+}
+
+async function storePhoto(bandId, url) {
+  const thumb = wikimediaThumb(url);
+  const data = (thumb && await photoToData(thumb)) || await photoToData(url);
+  photoStore[bandId] = { at: Date.now(), url, data };
+  saveOffline(OFFLINE.photos, photoStore);
+}
+
+async function fetchWikiImage(title, lang = "en") {
+  const data = await wikiJSON(`https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`);
+  const url = data?.originalimage?.source || data?.thumbnail?.source || null;
+  return isPromoPhotoUrl(url) ? url : null;
 }
 
 // Volltextsuche als Sicherheitsnetz, falls der exakte Artikeltitel nicht passt.
@@ -153,10 +231,8 @@ async function fetchWikiSearchImage(band, lang) {
       action: "query", format: "json", origin: "*", generator: "search",
       gsrsearch: searchName(band) + " Band", gsrlimit: "5", prop: "pageimages", piprop: "original"
     });
-    const res = await fetch(`https://${lang}.wikipedia.org/w/api.php?` + params,
-      { referrerPolicy: "no-referrer", signal: AbortSignal.timeout(5000) });
-    if (!res.ok) return null;
-    const data = await res.json();
+    const data = await wikiJSON(`https://${lang}.wikipedia.org/w/api.php?` + params);
+    if (!data) return null;
     const wanted = cleanStr(searchName(band));
     const pages = Object.values(data.query?.pages || {}).sort((a, b) => a.index - b.index);
     for (const page of pages) {
@@ -219,15 +295,26 @@ async function resolveBandPhoto(band) {
   return loadablePhoto(await fetchWikiImage(band.name.replace(/ /g, "_"), "de"));
 }
 
+// Online: Original-URL (beste Qualität). Offline: gespeicherte Kopie aus dem localStorage.
+const offlineSrc = entry => entry ? (navigator.onLine ? entry.url : entry.data || entry.url) : null;
+
 function getBandPhoto(band) {
   if (photoCache.has(band.id)) return Promise.resolve(photoCache.get(band.id));
+  const saved = photoStore[band.id];
+  if (isFresh(saved) && (saved.data || navigator.onLine)) {
+    const src = offlineSrc(saved);
+    photoCache.set(band.id, src);
+    return Promise.resolve(src);
+  }
   if (photoRequests.has(band.id)) return photoRequests.get(band.id);
   const pending = resolveBandPhoto(band)
     .catch(() => null)
     .then(photo => {
-      photoCache.set(band.id, photo);
+      if (photo) storePhoto(band.id, photo); // im Hintergrund für offline sichern
+      const src = photo || (saved ? saved.data || saved.url : null); // Funkloch: alter Stand statt leerer Kachel
+      photoCache.set(band.id, src);
       photoRequests.delete(band.id);
-      return photo;
+      return src;
     });
   photoRequests.set(band.id, pending);
   return pending;
@@ -260,6 +347,14 @@ document.addEventListener("error", event => {
   if (!(img instanceof HTMLImageElement) || !img.getAttribute("src")) return;
   const id = img.dataset.imgBandId || (img.id === "detail-img" ? activeBand?.id : null);
   if (!id) return;
+  // Original nicht erreichbar (z. B. Funkloch trotz "online"): auf die gespeicherte Kopie wechseln
+  const copy = photoStore[id]?.data;
+  if (copy && img.getAttribute("src") !== copy) {
+    photoCache.set(id, copy);
+    document.querySelectorAll(`img[data-img-band-id="${id}"]`).forEach(el => { el.src = copy; });
+    if (activeBand?.id === id) $("detail-img").src = copy;
+    return;
+  }
   photoCache.set(id, null);
   img.removeAttribute("src");
   applyPhoto(img, img.parentElement.querySelector(".stag-relief-fallback"), null);
@@ -1381,20 +1476,44 @@ const campVoters = bandId => Object.entries(campRatings[bandId] || {})
   .map(([key, vote]) => ({ key, name: vote.name || key }))
   .sort((a, b) => a.name.localeCompare(b.name, "de", { sensitivity: "base" }));
 
+/* ---- Hirschschädel-Zähler "Wer will mit?" ----
+   cold = niemand will hin (grau) · warm = 1–2 Stimmen (neutral)
+   hot  = Konsens (alle im Camp wollen hin) oder Mehrheit ab 3 Stimmen (Glut-Glow) */
+const skullIcon = '<img class="camp-skull" src="assets/stag-skull-clean.png" alt="" aria-hidden="true" decoding="async">';
+const HEAT_CLASSES = ["camp-cold", "camp-warm", "camp-hot"];
+
+// Camp-Größe: alle, die mindestens eine Band bewertet haben
+function campSize() {
+  const people = new Set();
+  Object.values(campRatings).forEach(votes => Object.keys(votes || {}).forEach(key => people.add(key)));
+  return people.size;
+}
+
+function campHeat(count) {
+  if (!count) return "camp-cold";
+  const size = campSize();
+  const hot = count >= 2 && (count === size || (count >= 3 && count > size / 2));
+  return hot ? "camp-hot" : "camp-warm";
+}
+
 function campCountBadgeHTML(bandId) {
   const count = campVotes(bandId).length;
-  if (!count) return "";
-  return `<span class="camp-count-badge card-camp-count" data-camp-band="${bandId}" aria-label="${count} aus dem Camp ${wantVerb(count)} die Band sehen">${peopleIcon}${count}</span>`;
+  const label = count ? `${count} aus dem Camp ${wantVerb(count)} die Band sehen` : "Noch niemand aus dem Camp will die Band sehen";
+  return `<span class="camp-count-badge card-camp-count ${campHeat(count)}" data-camp-band="${bandId}" aria-label="${label}" title="${label}">${skullIcon}${count}</span>`;
 }
 
 function updateDetailCampCount() {
   const badge = $("detail-camp-count");
-  const count = activeBand ? campVotes(activeBand.id).length : 0;
-  badge.hidden = !count;
-  if (!count) return;
+  badge.hidden = !activeBand;
+  if (!activeBand) return;
+  const count = campVotes(activeBand.id).length;
   badge.dataset.campBand = activeBand.id;
-  badge.innerHTML = `${peopleIcon}<span>${count} ${wantVerb(count)} die Band sehen</span>`;
-  badge.setAttribute("aria-label", `${count} ${wantVerb(count)} die Band sehen – Namen anzeigen`);
+  badge.classList.remove(...HEAT_CLASSES);
+  badge.classList.add(campHeat(count));
+  badge.innerHTML = count
+    ? `${skullIcon}<span>${count} ${wantVerb(count)} die Band sehen</span>`
+    : `${skullIcon}<span>Noch niemand will hin</span>`;
+  badge.setAttribute("aria-label", count ? `${count} ${wantVerb(count)} die Band sehen – Namen anzeigen` : "Noch niemand aus dem Camp will die Band sehen");
 }
 
 /* ---- Namen-Popover am Zähler: Maus = Hover, Touch/Tastatur = Antippen ---- */
@@ -1757,8 +1876,11 @@ $("export").addEventListener("click", () => {
   window.print();
 });
 
-/* START */
-render();
-if (window.matchMedia("(min-width: 901px)").matches && BANDS.length) openBand(BANDS[0]);
-initCamp();
-if (!userName) openNameModal(); // erster Besuch: Namen für das Camp abfragen
+/* START – erst nach der Crew-PIN (crew-gate.js): vorher keine Fotos, Hörproben oder Camp-Daten laden */
+function startApp() {
+  render();
+  if (window.matchMedia("(min-width: 901px)").matches && BANDS.length) openBand(BANDS[0]);
+  initCamp();
+  if (!userName) openNameModal(); // erster Besuch: Namen für das Camp abfragen
+}
+if (window.crewGate) window.crewGate.whenUnlocked(startApp); else startApp();

@@ -1,0 +1,11 @@
+# Nur die App gehört auf GitHub Pages – Arbeitsdateien, Geheimnisse und alte Stände bleiben lokal.
+# ACHTUNG: PROJEKT_PLAN.md enthält einen fal.ai-API-Schlüssel!
+PROJEKT_PLAN.md
+.claude/
+.agents/
+.taste-skill/
+skills-lock.json
+_archiv-v2/
+ROCKHARZ-2027/
+TESTBERICHT.md
+style.css

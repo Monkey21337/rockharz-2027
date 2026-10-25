@@ -4,13 +4,34 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#06090e">
+  <!-- Privates Camp-Tool: nicht in Suchmaschinen aufnehmen, keinen Links folgen -->
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="referrer" content="no-referrer">
   <title>ROCKHARZ 2027 · Band Dashboard</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Cinzel:wght@700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="rockharz-theme.css?v=306">
+  <!-- Schriften liegen lokal in assets/fonts (keine Verbindung zu Google Fonts) -->
+  <link rel="preload" href="assets/fonts/cinzel-700-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/barlow-condensed-600-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="rockharz-theme.css?v=309">
+  <!-- PIN-Sperre: muss vor dem Rendern laufen, damit nichts aufblitzt -->
+  <script src="crew-gate.js?v=308"></script>
 </head>
 <body>
+
+  <!-- CREW-SPERRE: einmal pro Gerät die PIN, danach startet die App sofort -->
+  <div class="crew-lock" id="crew-lock" role="dialog" aria-modal="true" aria-labelledby="crew-lock-title" aria-describedby="crew-lock-sub">
+    <div class="crew-lock-bg" aria-hidden="true"></div>
+    <form class="crew-lock-panel" id="crew-lock-form" novalidate>
+      <span class="player-frame" aria-hidden="true"></span>
+      <img class="crew-lock-crest" src="assets/stag-skull-clean.png" alt="" aria-hidden="true">
+      <h1 id="crew-lock-title">Rockharz Camp 2027</h1>
+      <p class="crew-lock-sub" id="crew-lock-sub">Zugang nur für die Crew</p>
+      <label class="crew-lock-label" for="crew-pin">Crew-PIN</label>
+      <input type="password" id="crew-pin" inputmode="numeric" pattern="[0-9]*" maxlength="8" autocomplete="off" enterkeyhint="go" placeholder="••••">
+      <p class="crew-lock-error" id="crew-pin-error" role="alert" hidden></p>
+      <button type="submit" class="crew-lock-enter">Eintreten</button>
+      <p class="crew-lock-legal">Inoffizielles, rein privates Fan-Projekt. Keine Verbindung zur Rockharz Open Air GmbH.</p>
+    </form>
+  </div>
 
   <!-- HEADER: Panorama (Desktop) bzw. kompaktes Motiv (Handy) -->
   <header class="hero-banner-container">
@@ -67,6 +88,10 @@
         <div class="heading-row"><h2>NOCH <em>UNBEWERTET</em></h2></div>
         <div id="unrated-grid" class="band-grid-concept"></div>
       </section>
+
+      <footer class="rh-footer">
+        <p>Inoffizielles, rein privates Fan-Projekt für unser Festival-Camp. Keine Verbindung zur Rockharz Open Air GmbH. Alle Rechte an Band-Artworks, Texten und Songs liegen bei den Künstlern und Rechteinhabern.</p>
+      </footer>
     </main>
 
     <!-- MOBILE BACKDROP -->
@@ -143,10 +168,10 @@
   </div>
 
   <audio id="preview-audio" preload="none"></audio>
-  <!-- Firebase (Compat-CDN, ohne Build-Tools); fällt bei Blockade sauber auf lokales Speichern zurück -->
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
-  <script src="bands.js?v=306"></script>
-  <script src="app.js?v=306"></script>
+  <!-- Firebase 10.14.1 (Compat, lokal gehostet – kein Abruf von gstatic.com); fällt bei Fehlern sauber auf lokales Speichern zurück -->
+  <script src="assets/vendor/firebase-app-compat.js"></script>
+  <script src="assets/vendor/firebase-database-compat.js"></script>
+  <script src="bands.js?v=308"></script>
+  <script src="app.js?v=308"></script>
 </body>
 </html>

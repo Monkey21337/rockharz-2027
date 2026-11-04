@@ -126,7 +126,7 @@ const WIKI_ONLY = {
 // Feste Deezer-Künstler-IDs (bandId -> ID): Namen wie "Equilibrium" gibt es bei Deezer mehrfach.
 // Ermittelt über den Katalog: Bei genau diesem Künstler stehen unsere Songs. Neue Band = neue Zeile.
 const DEEZER_ARTIST_IDS = {
-  "accept": 5761, "alestorm": 125436, "all-for-metal": 178819777, "arch-enemy": 1392,
+  "accept": 5761, "alestorm": 125436, "amon-amarth": 6065, "all-for-metal": 178819777, "arch-enemy": 1392,
   "beast-in-black": 13130131, "bruce-dickinson": 1779, "burning-witches": 12466006, "coppelius": 472675,
   "d-artagnan": 9617580, "dust-bolt": 513441, "eisbrecher": 5579, "elvenking": 16621, "emil-bulls": 80771,
   "equilibrium": 113493, "fear-factory": 2985, "grave-digger": 3798, "gutalax": 1346242, "gwar": 13096,

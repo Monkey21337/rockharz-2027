@@ -1,6 +1,6 @@
 "use strict";
 
-/* ROCKHARZ 2027 — OFFIZIELLE BANDS (BANDWELLE 1)
+/* ROCKHARZ 2027 — OFFIZIELLE BANDS (BANDWELLEN 1–3, Stand November 2026: 39 Bands)
    day bleibt null, bis die Running Order offiziell bestätigt ist.
    Bestätigte Tageswerte: "wed" (Mi), "thu" (Do), "fri" (Fr), "sat" (Sa).
 */
@@ -235,11 +235,19 @@ const BAND_DATA = [
     desc: "Wiener Frauen-Rockband mit dreckigen Riffs, Sleaze-Attitüde und Ohrwurm-Refrains.",
     songs: ["Good Time", "Rock Bottom", "Equal, Not the Same"],
     day: null
+  },
+
+  /* BANDWELLE 3 (bestätigt November 2026) */
+  {
+    name: "Amon Amarth", genre: "Melodic Death Metal", website: "https://www.amonamarth.com",
+    desc: "Schwedische Wikinger des Melodic Death Metal – Drachenboot auf der Bühne, Odins Hymnen und Rudern im Moshpit.",
+    songs: ["Twilight of the Thunder God", "Guardians of Asgaard", "Raise Your Horns"],
+    day: null
   }
 ];
 
 const ORIGINS = {
-  "Accept": "Deutschland", "Alestorm": "Schottland", "All for Metal": "Deutschland / Italien",
+  "Accept": "Deutschland", "Alestorm": "Schottland", "Amon Amarth": "Schweden", "All for Metal": "Deutschland / Italien",
   "Arch Enemy": "Schweden", "Bruce Dickinson": "Großbritannien", "Coppelius": "Deutschland",
   "D'Artagnan": "Deutschland", "Dust Bolt": "Deutschland",
   "Eisbrecher": "Deutschland", "Emil Bulls": "Deutschland", "Equilibrium": "Deutschland",

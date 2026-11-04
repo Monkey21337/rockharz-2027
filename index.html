@@ -6,14 +6,16 @@
   <meta name="theme-color" content="#06090e">
   <!-- Privates Camp-Tool: nicht in Suchmaschinen aufnehmen, keinen Links folgen -->
   <meta name="robots" content="noindex, nofollow">
-  <meta name="referrer" content="no-referrer">
+  <!-- Nur die Domain mitsenden (kein Pfad): Firebase-Anmeldung braucht sie, der API-Schlüssel ist auf diese Domain beschränkt.
+       Wikipedia-, Foto- und Katalog-Abrufe setzen weiterhin einzeln "no-referrer". -->
+  <meta name="referrer" content="strict-origin">
   <title>ROCKHARZ 2027 · Band Dashboard</title>
   <!-- Schriften liegen lokal in assets/fonts (keine Verbindung zu Google Fonts) -->
   <link rel="preload" href="assets/fonts/cinzel-700-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/barlow-condensed-600-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="rockharz-theme.css?v=312">
+  <link rel="stylesheet" href="rockharz-theme.css?v=313">
   <!-- Crew-Sperre: muss vor dem Rendern laufen, damit nichts aufblitzt -->
-  <script src="crew-gate.js?v=312"></script>
+  <script src="crew-gate.js?v=313"></script>
 </head>
 <body>
 
@@ -172,7 +174,7 @@
   <script src="assets/vendor/firebase-app-compat.js"></script>
   <script src="assets/vendor/firebase-auth-compat.js"></script>
   <script src="assets/vendor/firebase-database-compat.js"></script>
-  <script src="bands.js?v=312"></script>
-  <script src="app.js?v=312"></script>
+  <script src="bands.js?v=313"></script>
+  <script src="app.js?v=313"></script>
 </body>
 </html>

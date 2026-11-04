@@ -427,11 +427,12 @@ const AUDIO_CFG = {
 const AUDIO_STORE = "rockharz2027_previews_v3";
 try { ["rockharz2027_previews_v1", "rockharz2027_previews_v2"].forEach(key => localStorage.removeItem(key)); } catch {}
 
-// Referrer-Policy vorsorglich auf "no-referrer" (betrifft auch <audio>-Anfragen).
+// Referrer-Policy: höchstens die Domain, nie der Pfad (betrifft auch <audio>-Anfragen).
+// Nicht "no-referrer": dann blockt Google die Firebase-Anmeldung (API-Schlüssel ist domainbeschränkt).
 if (!document.querySelector('meta[name="referrer"]')) {
   const meta = document.createElement("meta");
   meta.name = "referrer";
-  meta.content = "no-referrer";
+  meta.content = "strict-origin";
   document.head.appendChild(meta);
 }
 

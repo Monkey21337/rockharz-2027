@@ -1651,20 +1651,85 @@ function uploadLocalIfEmpty() {
   campDb.ref("ratings").update(updates).catch(error => console.warn("[Camp] Hochladen fehlgeschlagen", error));
 }
 
-function initCamp() {
-  updateUserButton();
+/* ---- Zugang: anonyme Firebase-Anmeldung + Crew-Phrase ----
+   Die Phrase prüfen allein die Datenbank-Regeln (database.rules.json): /members/{uid} lässt sich nur
+   mit dem Wert aus /crewSecret beschreiben. Nur Mitglieder dürfen /ratings lesen und schreiben. */
+let campAuth = null;
+let campListening = false;
+
+function firebaseReady() {
+  if (campDb) return true;
   try {
-    if (window.firebase) {
-      if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
-      campDb = firebase.database();
-    }
+    if (!window.firebase) return false;
+    if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+    campAuth = firebase.auth();
+    campDb = firebase.database();
+    return true;
   } catch (error) {
     console.warn("[Camp] Firebase nicht verfügbar – Bewertungen bleiben lokal", error);
-    campDb = null;
+    campDb = campAuth = null;
+    return false;
   }
-  if (!campDb) { setSyncState(false); return; }
+}
+
+// Gespeicherte anonyme Sitzung übernehmen oder neu anmelden (kein Konto, keine E-Mail)
+function signedInUser() {
+  return new Promise((resolve, reject) => {
+    const off = campAuth.onAuthStateChanged(user => {
+      off();
+      if (user) resolve(user);
+      else campAuth.signInAnonymously().then(cred => resolve(cred.user), reject);
+    }, reject);
+  });
+}
+
+const withTimeout = (promise, ms) => Promise.race([promise, new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), ms))]);
+const isPermissionError = error => /permission/i.test(`${error?.code} ${error?.message}`);
+
+window.crewAuth = {
+  // "ok" | "wrong" | "offline"
+  async join(phrase) {
+    if (!firebaseReady()) return "offline";
+    try {
+      const user = await withTimeout(signedInUser(), 10000);
+      await withTimeout(campDb.ref(`members/${user.uid}`).set(phrase), 10000);
+      return "ok";
+    } catch (error) {
+      if (isPermissionError(error)) return "wrong";
+      console.warn("[Camp] Zugang konnte nicht geprüft werden", error);
+      return "offline";
+    }
+  }
+};
+
+function initCamp() {
+  updateUserButton();
+  if (!firebaseReady()) { setSyncState(false); return; }
 
   campDb.ref(".info/connected").on("value", snap => setSyncState(snap.val() === true));
+  // Offline bleibt "once" einfach hängen, bis wieder Netz da ist – bis dahin läuft alles lokal.
+  signedInUser()
+    .then(user => campDb.ref(`members/${user.uid}`).once("value"))
+    .then(snap => {
+      if (snap.exists()) { listenCamp(); return; }
+      // Sitzung verloren oder Crew zurückgesetzt: einmal neu eintreten
+      window.crewGate?.lock("Bitte gib die Crew-Phrase einmal neu ein.");
+      window.crewGate?.whenUnlocked(listenCamp);
+    })
+    .catch(error => {
+      if (isPermissionError(error)) {
+        window.crewGate?.lock("Bitte gib die Crew-Phrase einmal neu ein.");
+        window.crewGate?.whenUnlocked(listenCamp);
+        return;
+      }
+      console.warn("[Camp] Anmeldung fehlgeschlagen – Bewertungen bleiben lokal", error);
+      setSyncState(false);
+    });
+}
+
+function listenCamp() {
+  if (campListening) return;
+  campListening = true;
   campDb.ref("ratings").on("value", snap => {
     campRatings = snap.val() || {};
     const first = !campLoaded;
@@ -1674,6 +1739,11 @@ function initCamp() {
   }, error => {
     console.warn("[Camp] Lesen verweigert/fehlgeschlagen", error);
     setSyncState(false);
+    campListening = false;
+    if (isPermissionError(error)) { // Zugang entzogen (z. B. /members gelöscht)
+      window.crewGate?.lock("Bitte gib die Crew-Phrase einmal neu ein.");
+      window.crewGate?.whenUnlocked(listenCamp);
+    }
   });
 }
 

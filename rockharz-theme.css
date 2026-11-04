@@ -1559,10 +1559,9 @@ html.crew-unlocking .crew-lock { opacity: 0; visibility: hidden; }
   padding: 0 14px;
   text-align: center;
   font-family: var(--rh-ui);
-  font-size: 30px;
+  font-size: 22px;
   font-weight: 700;
-  letter-spacing: 0.5em;
-  text-indent: 0.5em; /* gleicht den Abstand nach dem letzten Zeichen aus */
+  letter-spacing: 0.12em;
   color: #fff;
   background: linear-gradient(180deg, #05080c 0%, #0a1018 100%);
   border: 1px solid #3f536d;
@@ -1570,7 +1569,7 @@ html.crew-unlocking .crew-lock { opacity: 0; visibility: hidden; }
   box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.9);
   outline: none;
 }
-#crew-pin::placeholder { color: #3f536d; letter-spacing: 0.4em; }
+#crew-pin::placeholder { color: #3f536d; letter-spacing: 0.02em; font-weight: 500; }
 #crew-pin:focus { border-color: var(--rh-copper); box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.9), 0 0 0 2px rgba(230, 103, 34, 0.35); }
 #crew-pin:disabled { opacity: 0.5; }
 .crew-lock-error { margin: 10px 0 0; font-size: 15px; color: #ff9a6b; }

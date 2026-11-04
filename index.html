@@ -11,13 +11,13 @@
   <!-- Schriften liegen lokal in assets/fonts (keine Verbindung zu Google Fonts) -->
   <link rel="preload" href="assets/fonts/cinzel-700-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/barlow-condensed-600-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="rockharz-theme.css?v=311">
-  <!-- PIN-Sperre: muss vor dem Rendern laufen, damit nichts aufblitzt -->
-  <script src="crew-gate.js?v=311"></script>
+  <link rel="stylesheet" href="rockharz-theme.css?v=312">
+  <!-- Crew-Sperre: muss vor dem Rendern laufen, damit nichts aufblitzt -->
+  <script src="crew-gate.js?v=312"></script>
 </head>
 <body>
 
-  <!-- CREW-SPERRE: einmal pro Gerät die PIN, danach startet die App sofort -->
+  <!-- CREW-SPERRE: einmal pro Gerät die Crew-Phrase (geprüft von Firebase), danach startet die App sofort -->
   <div class="crew-lock" id="crew-lock" role="dialog" aria-modal="true" aria-labelledby="crew-lock-title" aria-describedby="crew-lock-sub">
     <div class="crew-lock-bg" aria-hidden="true"></div>
     <form class="crew-lock-panel" id="crew-lock-form" novalidate>
@@ -25,8 +25,8 @@
       <img class="crew-lock-crest" src="assets/stag-skull-clean.png" alt="" aria-hidden="true">
       <h1 id="crew-lock-title">Rockharz Camp 2027</h1>
       <p class="crew-lock-sub" id="crew-lock-sub">Zugang nur für die Crew</p>
-      <label class="crew-lock-label" for="crew-pin">Crew-PIN</label>
-      <input type="password" id="crew-pin" inputmode="numeric" pattern="[0-9]*" maxlength="8" autocomplete="off" enterkeyhint="go" placeholder="••••">
+      <label class="crew-lock-label" for="crew-pin">Crew-Phrase</label>
+      <input type="password" id="crew-pin" maxlength="64" autocomplete="current-password" autocapitalize="off" spellcheck="false" enterkeyhint="go" placeholder="Phrase aus dem Camp">
       <p class="crew-lock-error" id="crew-pin-error" role="alert" hidden></p>
       <button type="submit" class="crew-lock-enter">Eintreten</button>
       <p class="crew-lock-legal">Inoffizielles, rein privates Fan-Projekt. Keine Verbindung zur Rockharz Open Air GmbH.</p>
@@ -170,8 +170,9 @@
   <audio id="preview-audio" preload="none"></audio>
   <!-- Firebase 10.14.1 (Compat, lokal gehostet – kein Abruf von gstatic.com); fällt bei Fehlern sauber auf lokales Speichern zurück -->
   <script src="assets/vendor/firebase-app-compat.js"></script>
+  <script src="assets/vendor/firebase-auth-compat.js"></script>
   <script src="assets/vendor/firebase-database-compat.js"></script>
-  <script src="bands.js?v=311"></script>
-  <script src="app.js?v=311"></script>
+  <script src="bands.js?v=312"></script>
+  <script src="app.js?v=312"></script>
 </body>
 </html>

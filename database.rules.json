@@ -1,0 +1,24 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "members": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid && newData.isString() && newData.val() === root.child('crewSecret').val()"
+      }
+    },
+
+    "ratings": {
+      ".read": "auth != null && root.child('members').child(auth.uid).exists()",
+      "$bandId": {
+        "$userKey": {
+          ".write": "auth != null && root.child('members').child(auth.uid).exists() && $bandId.length <= 60 && $userKey.length <= 60",
+          ".validate": "newData.hasChildren(['name', 'status', 'timestamp']) && newData.child('name').isString() && newData.child('name').val().length <= 30 && newData.child('status').isString() && newData.child('status').val().matches(/^(favorite|maybe|skip)$/) && newData.child('timestamp').isNumber()",
+          "$other": { ".validate": "$other === 'name' || $other === 'status' || $other === 'timestamp'" }
+        }
+      }
+    }
+  }
+}

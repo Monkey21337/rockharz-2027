@@ -13,9 +13,9 @@
   <!-- Schriften liegen lokal in assets/fonts (keine Verbindung zu Google Fonts) -->
   <link rel="preload" href="assets/fonts/cinzel-700-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/barlow-condensed-600-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="rockharz-theme.css?v=313">
+  <link rel="stylesheet" href="rockharz-theme.css?v=314">
   <!-- Crew-Sperre: muss vor dem Rendern laufen, damit nichts aufblitzt -->
-  <script src="crew-gate.js?v=313"></script>
+  <script src="crew-gate.js?v=314"></script>
 </head>
 <body>
 
@@ -28,7 +28,14 @@
       <h1 id="crew-lock-title">Rockharz Camp 2027</h1>
       <p class="crew-lock-sub" id="crew-lock-sub">Zugang nur für die Crew</p>
       <label class="crew-lock-label" for="crew-pin">Crew-Phrase</label>
-      <input type="password" id="crew-pin" maxlength="64" autocomplete="current-password" autocapitalize="off" spellcheck="false" enterkeyhint="go" placeholder="Phrase aus dem Camp">
+      <div class="crew-pin-wrap">
+        <input type="password" id="crew-pin" maxlength="64" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" placeholder="Phrase aus dem Camp">
+        <!-- Phrase sichtbar machen, um Tippfehler zu sehen -->
+        <button type="button" class="crew-pin-toggle" id="crew-pin-toggle" aria-label="Phrase anzeigen" aria-pressed="false" aria-controls="crew-pin">
+          <svg class="eye-open" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+          <svg class="eye-closed" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 5.1A10.7 10.7 0 0 1 12 5c6.4 0 10 7 10 7a17.6 17.6 0 0 1-3.2 4.2M6.6 6.6C3.8 8.4 2 12 2 12s3.6 7 10 7a9.8 9.8 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
+        </button>
+      </div>
       <p class="crew-lock-error" id="crew-pin-error" role="alert" hidden></p>
       <button type="submit" class="crew-lock-enter">Eintreten</button>
       <p class="crew-lock-legal">Inoffizielles, rein privates Fan-Projekt. Keine Verbindung zur Rockharz Open Air GmbH.</p>
@@ -174,7 +181,7 @@
   <script src="assets/vendor/firebase-app-compat.js"></script>
   <script src="assets/vendor/firebase-auth-compat.js"></script>
   <script src="assets/vendor/firebase-database-compat.js"></script>
-  <script src="bands.js?v=313"></script>
-  <script src="app.js?v=313"></script>
+  <script src="bands.js?v=314"></script>
+  <script src="app.js?v=314"></script>
 </body>
 </html>

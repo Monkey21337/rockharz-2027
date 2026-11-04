@@ -1569,6 +1569,33 @@ html.crew-unlocking .crew-lock { opacity: 0; visibility: hidden; }
   box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.9);
   outline: none;
 }
+/* Augen-Knopf: Phrase zum Prüfen auf Tippfehler sichtbar machen */
+.crew-pin-wrap { position: relative; }
+.crew-pin-wrap #crew-pin { padding: 0 52px; }
+.crew-pin-wrap #crew-pin[type="text"] { font-size: 19px; letter-spacing: 0.02em; } /* Klartext enger, damit lange Phrasen ganz sichtbar sind */
+.crew-pin-toggle {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  transform: translateY(-50%);
+  padding: 0;
+  color: var(--rh-muted);
+  background: none;
+  border: 0;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.crew-pin-toggle:hover { color: var(--rh-text); }
+.crew-pin-toggle:active { transform: translateY(-50%) scale(0.94); }
+.crew-pin-toggle svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.crew-pin-toggle .eye-closed,
+.crew-pin-toggle[aria-pressed="true"] .eye-open { display: none; }
+.crew-pin-toggle[aria-pressed="true"] .eye-closed { display: block; }
+.crew-pin-toggle:disabled { opacity: 0.5; cursor: not-allowed; }
 #crew-pin::placeholder { color: #3f536d; letter-spacing: 0.02em; font-weight: 500; }
 #crew-pin:focus { border-color: var(--rh-copper); box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.9), 0 0 0 2px rgba(230, 103, 34, 0.35); }
 #crew-pin:disabled { opacity: 0.5; }

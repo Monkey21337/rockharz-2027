@@ -70,8 +70,19 @@
       void form.offsetWidth; // Animation neu starten
       form.classList.add("crew-shake");
     };
+    const toggle = document.getElementById("crew-pin-toggle");
+    toggle.addEventListener("click", () => {
+      const show = input.type === "password";
+      input.type = show ? "text" : "password";
+      toggle.setAttribute("aria-pressed", String(show));
+      toggle.setAttribute("aria-label", show ? "Phrase verbergen" : "Phrase anzeigen");
+      input.focus();
+      input.setSelectionRange(input.value.length, input.value.length);
+    });
+
     const busy = on => {
       input.disabled = on;
+      toggle.disabled = on;
       button.disabled = on;
       button.textContent = on ? "Prüfe …" : "Eintreten";
     };
@@ -96,12 +107,13 @@
       }
 
       tries++;
-      input.value = "";
       if (tries < MAX_TRIES) {
-        showError("Falsche Phrase. Frag im Camp nach dem Code.");
+        // Eingabe stehen lassen: mit dem Augen-Knopf lässt sich der Tippfehler finden
+        showError("Falsche Phrase. Tipp aufs Auge, um deine Eingabe zu prüfen.");
         input.focus();
         return;
       }
+      input.value = "";
       // zu viele Fehlversuche: kurz sperren
       tries = 0;
       busy(true);

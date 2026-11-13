@@ -120,13 +120,17 @@ const searchName = band => cleanStr(band.name) === "dartagnan" ? "DArtagnan" : b
 const WIKI_ONLY = {
   dartagnan: [["DArtagnan_(Band)", "de"], ["D’Artagnan_(Band)", "de"], ["D'Artagnan_(Band)", "de"], ["DArtagnan_(band)", "en"]],
   accept: [["Accept_(band)", "en"], ["Accept", "de"]],
-  "dust bolt": [["Dust_Bolt", "en"], ["Dust_Bolt", "de"]]
+  "dust bolt": [["Dust_Bolt", "en"], ["Dust_Bolt", "de"]],
+  jayler: [["Jayler", "en"]] // Deezer hat nur das Logo; der Wikipedia-Artikel hat (Stand Nov. 2026) noch kein Foto -> Hirsch-Fallback
 };
 
 // Feste Deezer-Künstler-IDs (bandId -> ID): Namen wie "Equilibrium" gibt es bei Deezer mehrfach.
 // Ermittelt über den Katalog: Bei genau diesem Künstler stehen unsere Songs. Neue Band = neue Zeile.
 const DEEZER_ARTIST_IDS = {
-  "accept": 5761, "alestorm": 125436, "amon-amarth": 6065, "all-for-metal": 178819777, "arch-enemy": 1392,
+  "accept": 5761, "alestorm": 125436, "amon-amarth": 6065, "dropkick-murphys": 4611, "orbit-culture": 6199896, "eluveitie": 6253,
+  "orden-ogan": 179904, "our-promise": 68356922, "neaera": 393199, "angelus-apatrida": 321475,
+  "schattenmann": 5460888, "vanaheim": 1488870, "jayler": 141830062,
+  "all-for-metal": 178819777, "arch-enemy": 1392,
   "beast-in-black": 13130131, "bruce-dickinson": 1779, "burning-witches": 12466006, "coppelius": 472675,
   "d-artagnan": 9617580, "dust-bolt": 513441, "eisbrecher": 5579, "elvenking": 16621, "emil-bulls": 80771,
   "equilibrium": 113493, "fear-factory": 2985, "grave-digger": 3798, "gutalax": 1346242, "gwar": 13096,

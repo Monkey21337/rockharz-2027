@@ -1,6 +1,6 @@
 "use strict";
 
-/* ROCKHARZ 2027 — OFFIZIELLE BANDS (BANDWELLEN 1–3, Stand November 2026: 39 Bands)
+/* ROCKHARZ 2027 — OFFIZIELLE BANDS (BANDWELLEN 1–4, Stand 12. November 2026: 50 Bands, Line-up laut Festival „nahezu vollständig“)
    day bleibt null, bis die Running Order offiziell bestätigt ist.
    Bestätigte Tageswerte: "wed" (Mi), "thu" (Do), "fri" (Fr), "sat" (Sa).
 */
@@ -243,11 +243,82 @@ const BAND_DATA = [
     desc: "Schwedische Wikinger des Melodic Death Metal – Drachenboot auf der Bühne, Odins Hymnen und Rudern im Moshpit.",
     songs: ["Twilight of the Thunder God", "Guardians of Asgaard", "Raise Your Horns"],
     day: null
+  },
+
+  /* BANDWELLE 4 – letzte große Welle (bestätigt 12. November 2026) */
+  {
+    name: "Dropkick Murphys", genre: "Celtic Punk", website: "https://dropkickmurphys.com",
+    desc: "Celtic Punk aus Boston: Dudelsack, Banjo und Arbeiterhymnen, bei denen das ganze Infield mitgrölt.",
+    songs: ["I'm Shipping Up to Boston", "Rose Tattoo", "The State of Massachusetts"],
+    day: null
+  },
+  {
+    name: "Orbit Culture", genre: "Melodic Death Metal", website: "",
+    desc: "Schwedische Senkrechtstarter mit tonnenschweren Grooves, epischen Melodien und einer Stimme zwischen Growl und Hymne.",
+    songs: ["North Star of Nija", "Vultures of North", "The Tales of War"],
+    day: null
+  },
+  {
+    name: "Eluveitie", genre: "Folk Metal", website: "https://eluveitie.ch",
+    desc: "Schweizer Folk Metal mit Drehleier, Flöten und Geige – keltische Mythen treffen auf Melodic Death Metal.",
+    songs: ["Inis Mona", "The Call of the Mountains", "A Rose for Epona"],
+    day: null
+  },
+  {
+    name: "Orden Ogan", genre: "Power Metal", website: "https://ordenogan.de",
+    desc: "Power Metal aus dem Sauerland mit mächtigen Chören, Western- und Sci-Fi-Epen und Refrains zum Mitsingen.",
+    songs: ["Gunman", "F.E.V.E.R", "The Things We Believe In"],
+    day: null
+  },
+  {
+    name: "Our Promise", genre: "Metalcore", website: "",
+    desc: "Moderner Metalcore aus Stuttgart: harte Breakdowns, große Refrains und viel Bewegung vor der Bühne.",
+    songs: ["Panic Waves", "Spite", "The Worst"],
+    day: null
+  },
+  {
+    name: "Neaera", genre: "Melodic Death Metal", website: "",
+    desc: "Münsteraner Abrissbirne zwischen Melodic Death Metal und Metalcore – schnell, wütend und live eine Macht.",
+    songs: ["Spearheading the Spawn", "Let the Tempest Come", "Armamentarium"],
+    day: null
+  },
+  {
+    name: "Angelus Apatrida", genre: "Thrash Metal", website: "",
+    desc: "Spaniens Thrash-Metal-Aushängeschild aus Albacete: messerscharfe Riffs, hohes Tempo und Circle-Pit-Garantie.",
+    songs: ["Indoctrinate", "Cycle of Ruin", "Sharpen the Guillotine"],
+    day: null
+  },
+  {
+    name: "Schattenmann", genre: "Neue Deutsche Härte", website: "",
+    desc: "Neue Deutsche Härte aus Nürnberg mit Neon-Schminke, tanzbaren Riffs und einer großen Portion Provokation.",
+    songs: ["Dia de Muertos", "Generation Sex", "Licht an"],
+    day: null
+  },
+  {
+    name: "Third Class Party", genre: "", website: "",
+    desc: "Frisch bestätigt – zu dieser Band liegen uns noch keine gesicherten Infos und Hörproben vor.",
+    songs: [],
+    day: null
+  },
+  {
+    name: "Vanaheim", genre: "Folk Metal", website: "",
+    desc: "Epischer Folk Metal aus den Niederlanden mit orchestralen Arrangements und Texten auf Niederländisch und Englisch.",
+    songs: ["Daughter of the Dawn", "Onbevangen", "Reuzenspraak"],
+    day: null
+  },
+  {
+    name: "Jayler", genre: "Hard Rock", website: "",
+    desc: "Junge Rockband aus England mit bluesigem Hard Rock im Geist der Siebziger – große Riffs, große Stimme.",
+    songs: ["Riverboat Queen", "Acid Rain", "The Getaway"],
+    day: null
   }
 ];
 
 const ORIGINS = {
-  "Accept": "Deutschland", "Alestorm": "Schottland", "Amon Amarth": "Schweden", "All for Metal": "Deutschland / Italien",
+  "Accept": "Deutschland", "Alestorm": "Schottland", "Amon Amarth": "Schweden", "Dropkick Murphys": "USA", "Orbit Culture": "Schweden",
+  "Eluveitie": "Schweiz", "Orden Ogan": "Deutschland", "Our Promise": "Deutschland", "Neaera": "Deutschland",
+  "Angelus Apatrida": "Spanien", "Schattenmann": "Deutschland", "Vanaheim": "Niederlande", "Jayler": "England",
+  "All for Metal": "Deutschland / Italien",
   "Arch Enemy": "Schweden", "Bruce Dickinson": "Großbritannien", "Coppelius": "Deutschland",
   "D'Artagnan": "Deutschland", "Dust Bolt": "Deutschland",
   "Eisbrecher": "Deutschland", "Emil Bulls": "Deutschland", "Equilibrium": "Deutschland",

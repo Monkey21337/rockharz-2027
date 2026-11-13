@@ -121,7 +121,14 @@ const WIKI_ONLY = {
   dartagnan: [["DArtagnan_(Band)", "de"], ["D’Artagnan_(Band)", "de"], ["D'Artagnan_(Band)", "de"], ["DArtagnan_(band)", "en"]],
   accept: [["Accept_(band)", "en"], ["Accept", "de"]],
   "dust bolt": [["Dust_Bolt", "en"], ["Dust_Bolt", "de"]],
-  jayler: [["Jayler", "en"]] // Deezer hat nur das Logo; der Wikipedia-Artikel hat (Stand Nov. 2026) noch kein Foto -> Hirsch-Fallback
+  jayler: [["Jayler", "en"]] // Deezer hat nur das Logo; greift nur, falls das Pressefoto unten nicht lädt
+};
+
+// Feste Pressefotos (bandId -> URL) für Bands, die weder bei Deezer noch bei Wikipedia ein Foto haben.
+// Wird zuerst versucht; lädt das Bild nicht mehr, greift die normale Kette (Deezer -> Wikipedia -> Hirsch).
+const PHOTO_OVERRIDES = {
+  "jayler": "https://i0.wp.com/jayler.co.uk/wp-content/uploads/2025/03/Jayler_2025_AFord-627213.jpg?w=1024&ssl=1", // von jayler.co.uk (Foto: Andy Ford), über den WordPress-Bilddienst wegen CORS für die Offline-Kopie
+  "third-class-party": "https://i0.wp.com/magazin.nordmensch-in-concerts.com/wp-content/uploads/2026/10/TCP_quer_Fotograf-Hendrik-Prostka.png?fit=800%2C450&ssl=1" // Pressefoto: Hendrik Prostka
 };
 
 // Feste Deezer-Künstler-IDs (bandId -> ID): Namen wie "Equilibrium" gibt es bei Deezer mehrfach.
@@ -300,6 +307,8 @@ function loadablePhoto(url) {
 }
 
 async function resolveBandPhoto(band) {
+  const fixed = await loadablePhoto(PHOTO_OVERRIDES[band.id]);
+  if (fixed) return fixed;
   const wikiOnly = WIKI_ONLY[cleanStr(band.name)];
   if (wikiOnly) {
     for (const [title, lang] of wikiOnly) {
@@ -1400,7 +1409,7 @@ function openBand(band) {
   // Tracklist
   $("detail-songs").innerHTML = band.songs.length
     ? band.songs.map((song, i) => songRowHTML(band, song, i)).join("")
-    : '<div class="empty-state" style="padding:10px 0;font-size:15px">Keine Songs hinterlegt.</div>';
+    : '<div class="empty-state" style="padding:10px 0;font-size:15px">Noch keine Hörproben verfügbar.</div>';
 
   // Bekannte Fehlschläge sofort ausgrauen, Deezer-Treffer im Hintergrund vorwärmen
   band.songs.forEach((song, index) => {

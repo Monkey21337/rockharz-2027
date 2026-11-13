@@ -295,9 +295,9 @@ const BAND_DATA = [
     day: null
   },
   {
-    name: "Third Class Party", genre: "", website: "",
-    desc: "Frisch bestätigt – zu dieser Band liegen uns noch keine gesicherten Infos und Hörproben vor.",
-    songs: [],
+    name: "Third Class Party", genre: "Folk Punk", website: "",
+    desc: "Neues Folk-Punk-Trio um Mia Callaghan und Paddy Maguire (ex-The O'Reillys and the Paddyhats) – Geige, Gitarre, Schlagzeug. Die erste Single ist angekündigt, Hörproben folgen.",
+    songs: [], // Stand Nov. 2026 noch nichts veröffentlicht – nach erster Single nachtragen (dann auch Deezer-ID in app.js)
     day: null
   },
   {
@@ -317,7 +317,7 @@ const BAND_DATA = [
 const ORIGINS = {
   "Accept": "Deutschland", "Alestorm": "Schottland", "Amon Amarth": "Schweden", "Dropkick Murphys": "USA", "Orbit Culture": "Schweden",
   "Eluveitie": "Schweiz", "Orden Ogan": "Deutschland", "Our Promise": "Deutschland", "Neaera": "Deutschland",
-  "Angelus Apatrida": "Spanien", "Schattenmann": "Deutschland", "Vanaheim": "Niederlande", "Jayler": "England",
+  "Angelus Apatrida": "Spanien", "Schattenmann": "Deutschland", "Vanaheim": "Niederlande", "Third Class Party": "Deutschland", "Jayler": "England",
   "All for Metal": "Deutschland / Italien",
   "Arch Enemy": "Schweden", "Bruce Dickinson": "Großbritannien", "Coppelius": "Deutschland",
   "D'Artagnan": "Deutschland", "Dust Bolt": "Deutschland",
